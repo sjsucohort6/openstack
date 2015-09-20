@@ -12,7 +12,7 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.api;
+package edu.sjsu.cohort6.openstack.common.api;
 
 /**
  * Created by rwatsh on 9/20/15.

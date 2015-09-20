@@ -18,8 +18,10 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Closeables;
 import com.google.inject.Module;
-import edu.sjsu.cohort6.openstack.api.OpenStackInterface;
+import edu.sjsu.cohort6.openstack.common.api.OpenStackInterface;
 import org.jclouds.ContextBuilder;
+import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.openstack.keystone.v2_0.KeystoneApi;
 import org.jclouds.openstack.keystone.v2_0.domain.Tenant;
@@ -41,10 +43,13 @@ import java.util.logging.Logger;
 
 /**
  * Created by rwatsh on 9/19/15.
+ *
+ * @see https://jclouds.apache.org/start/compute/
  */
 public class OpenStackClient implements OpenStackInterface {
 
     private NovaApi novaApi = null;
+    private ComputeService computeService = null;
     private Set<String> regions = null;
     private KeystoneApi keystoneApi = null;
     private String tenantName = "admin";
@@ -71,6 +76,11 @@ public class OpenStackClient implements OpenStackInterface {
 
         regions = novaApi.getConfiguredRegions();
 
+        computeService = ContextBuilder.newBuilder(provider)
+                .endpoint(endpoint)
+                .credentials(identity, password)
+                .modules(modules).buildView(ComputeServiceContext.class).getComputeService();
+
         provider = "openstack-keystone";
 
         keystoneApi = ContextBuilder.newBuilder(provider)
@@ -79,6 +89,8 @@ public class OpenStackClient implements OpenStackInterface {
                 .modules(modules)
                 .buildApi(KeystoneApi.class);
     }
+
+
 
     public List<Server> listServers() {
         List<Server> servers = new ArrayList<>();

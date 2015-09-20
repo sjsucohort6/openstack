@@ -15,7 +15,7 @@
 package edu.sjsu.cohort6.openstack.test;
 
 import edu.sjsu.cohort6.openstack.OpenStackClient;
-import edu.sjsu.cohort6.openstack.api.OpenStackInterface;
+import edu.sjsu.cohort6.openstack.common.api.OpenStackInterface;
 import org.jclouds.openstack.keystone.v2_0.domain.Tenant;
 import org.jclouds.openstack.keystone.v2_0.domain.User;
 import org.jclouds.openstack.nova.v2_0.domain.Server;

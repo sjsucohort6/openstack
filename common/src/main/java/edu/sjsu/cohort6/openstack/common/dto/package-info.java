@@ -12,20 +12,12 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.api;
-
-import org.jclouds.openstack.keystone.v2_0.domain.Tenant;
-import org.jclouds.openstack.keystone.v2_0.domain.User;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
-
-import java.io.Closeable;
-import java.util.List;
-
 /**
- * Created by rwatsh on 9/20/15.
+ * This package consists of class files that are used as Data Transfer Objects between Web service and the
+ * Web UI.
+ *
+ * It also decouples the data obtained from OpenStack for consumption by our application.
+ *
+ * @author rwatsh
  */
-public interface OpenStackInterface extends Closeable {
-    List<Server> listServers();
-    Tenant createTenant();
-    User createUser(Tenant tenant);
-}
+package edu.sjsu.cohort6.openstack.common.dto;

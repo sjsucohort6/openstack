@@ -12,12 +12,23 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.db;
+package edu.sjsu.cohort6.openstack.common.api;
 
-import edu.sjsu.cohort6.openstack.common.api.DBClient;
+import org.jclouds.openstack.keystone.v2_0.domain.Tenant;
+import org.jclouds.openstack.keystone.v2_0.domain.User;
+import org.jclouds.openstack.nova.v2_0.domain.Server;
+
+import java.io.Closeable;
+import java.util.List;
 
 /**
  * Created by rwatsh on 9/20/15.
  */
-public class MongoDBClient implements DBClient {
+public interface OpenStackInterface extends Closeable {
+    // Compute
+    List<Server> listServers();
+
+    // Keystone - Tenant API not available in our openstack so we need to pre-create it.
+    Tenant createTenant();
+    User createUser(Tenant tenant);
 }
