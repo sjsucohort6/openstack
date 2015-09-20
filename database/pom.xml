@@ -41,7 +41,7 @@
             <version>${morphia.version}</version>
         </dependency>
         <dependency>
-            <groupId>edu.sjsu.cohort6.esp</groupId>
+            <groupId>edu.sjsu.cohort6.openstack</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
         </dependency>
