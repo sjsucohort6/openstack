@@ -10,6 +10,9 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>openstack-client</module>
+        <module>database</module>
+        <module>common</module>
+        <module>webservice</module>
     </modules>
 
 
