@@ -158,4 +158,14 @@ public class OpenStackClient implements OpenStackInterface {
     public void close() throws IOException {
         Closeables.close(novaApi, true);
     }
+
+    public static void main(String[] args) {
+        try(OpenStackInterface openStackClient = new OpenStackClient("admin", "admin", "61f23b78184d4b92", "http://10.0.2.15:5000/v2.0/")) {
+            List<Server> servers = openStackClient.listServers();
+            System.out.println(servers);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
