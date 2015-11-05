@@ -35,7 +35,7 @@ public class OpenStackClientTest {
 
     @BeforeMethod
     public void setUp() throws Exception {
-        openStackClient = new OpenStackClient("admin", "admin", "61f23b78184d4b92", "http://10.0.2.15:5000/v2.0/");
+        openStackClient = new OpenStackClient(); //new OpenStackClient("admin", "admin", "61f23b78184d4b92", "http://10.0.2.15:5000/v2.0/");
     }
 
     @AfterMethod

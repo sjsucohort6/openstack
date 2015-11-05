@@ -14,7 +14,7 @@
 
 package edu.sjsu.cohort6.openstack;
 
-import com.google.common.base.Optional;
+/*import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Closeables;
 import com.google.inject.Module;
@@ -39,7 +39,15 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
+import java.util.logging.Logger;*/
+
+import edu.sjsu.cohort6.openstack.common.api.OpenStackInterface;
+import org.jclouds.openstack.keystone.v2_0.domain.Tenant;
+import org.jclouds.openstack.keystone.v2_0.domain.User;
+import org.jclouds.openstack.nova.v2_0.domain.Server;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by rwatsh on 9/19/15.
@@ -47,8 +55,27 @@ import java.util.logging.Logger;
  * @see https://jclouds.apache.org/start/compute/
  */
 public class OpenStackClient implements OpenStackInterface {
+    @Override
+    public List<Server> listServers() {
+        return null;
+    }
 
-    private NovaApi novaApi = null;
+    @Override
+    public Tenant createTenant() {
+        return null;
+    }
+
+    @Override
+    public User createUser(Tenant tenant) {
+        return null;
+    }
+
+    @Override
+    public void close() throws IOException {
+
+    }//implements OpenStackInterface {
+
+    /*private NovaApi novaApi = null;
     private ComputeService computeService = null;
     private Set<String> regions = null;
     private KeystoneApi keystoneApi = null;
@@ -167,5 +194,5 @@ public class OpenStackClient implements OpenStackInterface {
             e.printStackTrace();
         }
 
-    }
+    }*/
 }

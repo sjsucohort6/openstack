@@ -9,9 +9,9 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
+        <module>common</module>
         <module>openstack-client</module>
         <module>database</module>
-        <module>common</module>
         <module>webservice</module>
     </modules>
 
