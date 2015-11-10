@@ -14,10 +14,19 @@
 
 package edu.sjsu.cohort6.openstack.db;
 
-import edu.sjsu.cohort6.openstack.common.api.DBClient;
+import org.mongodb.morphia.Morphia;
 
 /**
  * Created by rwatsh on 9/20/15.
  */
-public class MongoDBClient implements DBClient {
+public interface DBClient {
+    // Common operations which don't belong in entities.
+    void dropDB(String dbName);
+    void useDB(String dbName);
+    boolean checkHealth();
+    String getConnectString();
+
+    // Gets the entity DAO instance.
+    Object getDAO(Class<? extends BaseDAO> clazz);
+    Morphia getMorphia();
 }

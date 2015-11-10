@@ -26,41 +26,77 @@
     <artifactId>webservice</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <spark.version>2.3</spark.version>
+        <quartz.version>2.2.2</quartz.version>
+        <openstack4j.version>2.0.8-SNAPSHOT</openstack4j.version>
+        <guice.version>4.0</guice.version>
+        <freemarker.version>2.3.23</freemarker.version>
+        <gson.version>2.4</gson.version>
+        <lombok.version>1.16.6</lombok.version>
+        <testng.version>6.8.8</testng.version>
+    </properties>
+
+
     <dependencies>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.8.8</version>
+            <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-            <version>2.3.23</version>
+            <version>${freemarker.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-template-freemarker</artifactId>
-            <version>2.3</version>
+            <version>${spark.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>
-            <version>2.3</version>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz-jobs</artifactId>
+            <version>${quartz.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <version>4.0</version>
+            <version>${guice.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <!--<scope>provided</scope>-->
+        </dependency>
         <dependency>
             <groupId>org.pacesys</groupId>
             <artifactId>openstack4j</artifactId>
-            <version>2.0.8-SNAPSHOT</version>
+            <version>${openstack4j.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>edu.sjsu.cohort6.openstack</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>edu.sjsu.cohort6.openstack</groupId>
             <artifactId>database</artifactId>
@@ -75,6 +111,7 @@
     </dependencies>
 
     <repositories>
+        <!-- OpenStack4J repo -->
         <repository>
             <id>st-snapshots</id>
             <name>sonatype-snapshots</name>

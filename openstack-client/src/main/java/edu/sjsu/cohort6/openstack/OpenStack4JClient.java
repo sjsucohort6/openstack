@@ -14,24 +14,54 @@
 
 package edu.sjsu.cohort6.openstack;
 
+import edu.sjsu.cohort6.openstack.common.api.OpenStackInterface;
+import edu.sjsu.cohort6.openstack.common.api.ServiceSpec;
+import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
-import org.openstack4j.model.common.Identifier;
+import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Server;
+import org.openstack4j.model.compute.ServerCreate;
+import org.openstack4j.model.compute.SimpleTenantUsage;
 import org.openstack4j.model.identity.Tenant;
 import org.openstack4j.model.identity.User;
 import org.openstack4j.model.image.Image;
 import org.openstack4j.model.network.Network;
-import org.openstack4j.model.network.Router;
 import org.openstack4j.model.network.Subnet;
 import org.openstack4j.openstack.OSFactory;
 
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author rwatsh on 11/1/15.
  */
-public class OpenStack4JClient {
+public class OpenStack4JClient implements OpenStackInterface{
+
+    private static final Logger LOGGER = Logger.getLogger(OpenStack4JClient.class.getName());
+    private OSClient os = null;
+    private String user = null;
+    private String passwd = null;
+    private String tenant = null;
+
+    public OpenStack4JClient(String user, String passwd, String tenant) {
+        os = authenticateUser(user, passwd, tenant);
+        this.user = user;
+        this.passwd = passwd;
+        this.tenant = tenant;
+    }
+
+    public static OSClient authenticateUser(String user, String passwd, String tenant) throws AuthenticationException {
+        return OSFactory.builder()
+                .endpoint("http://127.0.0.1:5000/v2.0")
+                .credentials(user,passwd)
+                .tenantName(tenant)
+                .authenticate();
+    }
+
     public static void main(String[] args) {
         testOpenstack();
 
@@ -39,59 +69,147 @@ public class OpenStack4JClient {
 
     public static void testOpenstack() {
         try {
-            Identifier domainIdentifier = Identifier.byName("example-domain");
-            /*IOSClientBuilder.V3 osV3Builder = OSFactory.builderV3()
-                    .endpoint("http://10.0.2.15:5000/v3")
-                    .credentials("admin", "61f23b78184d4b92");
 
-            OSClient os = osV3Builder.authenticate();*/
+            LOGGER.info("Creating service VM.... ");
+            OpenStack4JClient client = new OpenStack4JClient("admin", "61f23b78184d4b92", "admin");
+            Flavor f = client.getFlavorByName("m1.small");
+            Image image = client.getImageByName("MY-UBUNTU-VM");
+            Network net = client.getNetworkByName("net1");
+            LOGGER.info(MessageFormat.format("Creating VM with flavor {0} and image {1} and network {2}",
+                    f.getName(), image.getName(), net.getName()));
+            client.startVM(new ServiceSpec("watshVM", f.getId(), image.getId(), net.getId()));
 
-            OSClient os = OSFactory.builder()
-                    .endpoint("http://127.0.0.1:5000/v2.0")
-                    .credentials("admin","61f23b78184d4b92")
-                    .tenantName("admin")
-                    .authenticate();
 
-            // Find all Users
-            List<? extends User> users = os.identity().users().list();
-            System.out.println(users);
-
-            // List all Tenants
-            List<? extends Tenant> tenants = os.identity().tenants().list();
-            System.out.println(tenants);
-
-            // Find all Compute Flavors
-            List<? extends Flavor> flavors = os.compute().flavors().list();
-            System.out.println(flavors);
-
-            // Find all running Servers
-            List<? extends Server> servers = os.compute().servers().list();
-            System.out.println(servers);
-
-            // Suspend a Server
-            //os.compute().servers().action("serverId", Action.SUSPEND);
-
-            // List all Networks
-
-            // List all Subnets
-            List<? extends Subnet> subnets = os.networking().subnet().list();
-            System.out.println(subnets);
-            List<? extends Network> networks = os.networking().network().list();
-            System.out.println(networks);
-
-            // List all Routers
-            List<? extends Router> routers = os.networking().router().list();
-            System.out.println(routers);
-
-            // List all Images (Glance)
-            List<? extends Image> images = os.images().list();
-            System.out.println(images);
-
-            // Download the Image Data
-            //InputStream is = os.images().getAsStream("imageId");
         } catch (Exception e) {
             System.out.println("Got error... ");
             e.printStackTrace();
         }
     }
+
+    @Override
+    public Network getNetworkByName(String name) {
+        List<? extends Network> networks = getAllNetworks();
+        if (networks != null) {
+            for (Network network : networks) {
+                if (network.getName().equals(name)) {
+                    return network;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void close() throws IOException {
+
+    }
+
+    /**
+     * Provision a VM and start it.
+     *
+     * @param serviceSpec
+     * @return
+     */
+    @Override
+    public Server startVM(ServiceSpec serviceSpec) {
+        ServerCreate sc = Builders.server()
+                .name(serviceSpec.getName())
+                .flavor(serviceSpec.getFlavorId())
+                .image(serviceSpec.getImageId())
+                .networks(new ArrayList<String>() {{
+                    add(serviceSpec.getNetworkId());
+                }})
+                .build();
+        // Boot the Server
+        Server server = os.compute().servers().boot(sc);
+        return server;
+    }
+
+    @Override
+    public List<? extends Flavor> getFlavors() {
+        return os.compute().flavors().list();
+    }
+
+    @Override
+    public Flavor getFlavorByName(String name) {
+        List<? extends Flavor> flavors = os.compute().flavors().list();
+        for (Flavor f: flavors) {
+            if (f.getName().equals(name)) {
+                return f;
+            }
+        }
+        return null;
+    }
+
+
+
+    @Override
+    public Tenant createTenant(String name, String description) {
+        Tenant tenant = os.identity().tenants()
+                .create(new Builders().tenant().name(name).description(description).build());
+        return tenant;
+    }
+
+    @Override
+    public List<? extends Tenant> getAllTenants() {
+        return os.identity().tenants().list();
+    }
+
+    @Override
+    public SimpleTenantUsage getQuotaForTenant() {
+        return os.compute().quotaSets().getTenantUsage(tenant);
+    }
+
+    @Override
+    public User createUser(String name, String password, String emailId) {
+        Tenant t = os.identity().tenants().getByName(tenant);
+        // Create a User associated to the ABC Corporation tenant
+        User user = os.identity().users()
+                .create(new Builders().user()
+                        .name(name)
+                        .password(password)
+                        .email(emailId)
+                        .tenant(t).build());
+
+        return user;
+
+    }
+
+    @Override
+    public Network createNetwork(String name, String tenantName) {
+        return null;
+    }
+
+    @Override
+    public List<? extends Network> getAllNetworks() {
+        return os.networking().network().list();
+    }
+
+    @Override
+    public Subnet createSubnet(String name, String networkId, String tenantId, String startIpPool, String endIpPool, String cidr) {
+        return null;
+    }
+
+    @Override
+    public List<? extends Subnet> getAllSubnets() {
+        return null;
+    }
+
+    @Override
+    public Image getImageByName(String name) {
+        List<? extends Image> images = os.images().list();
+        for (Image image: images) {
+            if (image.getName().equals(name)) {
+                return image;
+            }
+        }
+        return null;
+    }
+
+    /*@Override
+    public Router createRouter(String name, String networkId) {
+        return null;
+    }*/
+
+
 }

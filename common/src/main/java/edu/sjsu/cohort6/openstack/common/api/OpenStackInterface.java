@@ -14,21 +14,46 @@
 
 package edu.sjsu.cohort6.openstack.common.api;
 
-import org.jclouds.openstack.keystone.v2_0.domain.Tenant;
-import org.jclouds.openstack.keystone.v2_0.domain.User;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
+import org.openstack4j.model.compute.Flavor;
+import org.openstack4j.model.compute.Server;
+import org.openstack4j.model.compute.SimpleTenantUsage;
+import org.openstack4j.model.identity.Tenant;
+import org.openstack4j.model.identity.User;
+import org.openstack4j.model.image.Image;
+import org.openstack4j.model.network.Network;
+import org.openstack4j.model.network.Subnet;
 
 import java.io.Closeable;
 import java.util.List;
 
 /**
+ * OpenStack client interface.
+ *
  * Created by rwatsh on 9/20/15.
  */
 public interface OpenStackInterface extends Closeable {
-    // Compute
-    List<Server> listServers();
 
-    // Keystone - Tenant API not available in our openstack so we need to pre-create it.
-    Tenant createTenant();
-    User createUser(Tenant tenant);
+    Network getNetworkByName(String net1);
+
+    //server
+    public Server startVM(ServiceSpec serviceSpec);
+    public List<? extends Flavor> getFlavors();
+    public Flavor getFlavorByName(String name);
+
+
+    //tenant
+    public Tenant createTenant(String name, String description);
+    public List<? extends Tenant> getAllTenants();
+    public SimpleTenantUsage getQuotaForTenant();
+    public User createUser(String name, String password, String emailId);
+
+    //network
+    public Network createNetwork(String name, String tenantName);
+    public List<? extends Network> getAllNetworks();
+    public Subnet createSubnet(String name, String networkId, String tenantId, String startIpPool, String endIpPool, String cidr);
+    public List<? extends Subnet> getAllSubnets();
+    //public Router createRouter(String name, String networkId, )
+
+    // Image
+    public Image getImageByName(String name);
 }

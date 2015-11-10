@@ -26,19 +26,32 @@
     <artifactId>common</artifactId>
 
     <properties>
-        <jclouds.version>1.9.1</jclouds.version>
+        <morphia.version>1.0.1</morphia.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.jclouds.api</groupId>
-            <artifactId>openstack-keystone</artifactId>
-            <version>${jclouds.version}</version>
+            <groupId>org.mongodb.morphia</groupId>
+            <artifactId>morphia</artifactId>
+            <version>${morphia.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.jclouds.api</groupId>
-            <artifactId>openstack-nova</artifactId>
-            <version>${jclouds.version}</version>
+            <groupId>org.pacesys</groupId>
+            <artifactId>openstack4j</artifactId>
+            <version>2.0.8-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
         </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>st-snapshots</id>
+            <name>sonatype-snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
 </project>

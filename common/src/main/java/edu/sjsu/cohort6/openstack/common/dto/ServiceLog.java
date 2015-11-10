@@ -12,10 +12,38 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.common.api;
+package edu.sjsu.cohort6.openstack.common.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.mongodb.morphia.annotations.Embedded;
+
+import java.util.Date;
 
 /**
- * Created by rwatsh on 9/20/15.
+ * Model for storing service logs.
+ *
+ * @author rwatsh on 11/5/15.
  */
-public interface DBClient {
+@Embedded
+public class ServiceLog {
+    private String message;
+    private Date time;
+
+    @JsonProperty
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    @JsonProperty
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
