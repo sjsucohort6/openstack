@@ -14,9 +14,23 @@
 
 package edu.sjsu.cohort6.openstack.common.api;
 
+import java.text.MessageFormat;
+
 /**
  * @author rwatsh on 11/7/15.
  */
-public interface Validable {
-    boolean isValid() throws ValidationException;
+public abstract class Validable {
+    public abstract boolean isValid() throws ValidationException;
+
+    protected boolean isReqd(Object obj)  throws ValidationException {
+        if (obj == null) {
+            throw new ValidationException(MessageFormat.format("{0} cannot be null", obj));
+        }
+        if (obj instanceof String) {
+            if (((String) obj).isEmpty()) {
+                throw new ValidationException(MessageFormat.format("{0} cannot be blank", obj));
+            }
+        }
+        return true;
+    }
 }

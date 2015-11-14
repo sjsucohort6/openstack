@@ -12,21 +12,16 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.db;
-
-import org.mongodb.morphia.Morphia;
+package edu.sjsu.cohort6.openstack.job;
 
 /**
- * Created by rwatsh on 9/20/15.
+ * An OpenStack related exception that occurred while executing the job.
+ *
+ * @author rwatsh on 11/12/15.
  */
-public interface DBClient extends AutoCloseable {
-    // Common operations which don't belong in entities.
-    void dropDB(String dbName);
-    void useDB(String dbName);
-    boolean checkHealth();
-    String getConnectString();
+public class OpenStackJobException extends Exception {
 
-    // Gets the entity DAO instance.
-    Object getDAO(Class<? extends BaseDAO> clazz);
-    Morphia getMorphia();
+    public OpenStackJobException(String message) {
+        super(message);
+    }
 }

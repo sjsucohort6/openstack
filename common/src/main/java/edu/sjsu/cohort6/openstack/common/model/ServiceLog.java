@@ -12,21 +12,38 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.db;
+package edu.sjsu.cohort6.openstack.common.model;
 
-import org.mongodb.morphia.Morphia;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.mongodb.morphia.annotations.Embedded;
+
+import java.util.Date;
 
 /**
- * Created by rwatsh on 9/20/15.
+ * Model for storing service logs.
+ *
+ * @author rwatsh on 11/5/15.
  */
-public interface DBClient extends AutoCloseable {
-    // Common operations which don't belong in entities.
-    void dropDB(String dbName);
-    void useDB(String dbName);
-    boolean checkHealth();
-    String getConnectString();
+@Embedded
+public class ServiceLog {
+    private String message;
+    private Date time;
 
-    // Gets the entity DAO instance.
-    Object getDAO(Class<? extends BaseDAO> clazz);
-    Morphia getMorphia();
+    @JsonProperty
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    @JsonProperty
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

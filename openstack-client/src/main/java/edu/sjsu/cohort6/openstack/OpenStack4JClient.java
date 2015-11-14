@@ -16,6 +16,8 @@ package edu.sjsu.cohort6.openstack;
 
 import edu.sjsu.cohort6.openstack.common.api.OpenStackInterface;
 import edu.sjsu.cohort6.openstack.common.api.ServiceSpec;
+import edu.sjsu.cohort6.openstack.common.model.Node;
+import edu.sjsu.cohort6.openstack.common.model.Service;
 import org.openstack4j.api.Builders;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.exceptions.AuthenticationException;
@@ -125,6 +127,15 @@ public class OpenStack4JClient implements OpenStackInterface{
         return server;
     }
 
+    public void deleteServers(Service service) {
+        if (service != null) {
+            List<Node> nodes = service.getNodes();
+            for (Node node: nodes) {
+                os.compute().servers().delete(node.getNodeId());
+            }
+        }
+    }
+
     @Override
     public List<? extends Flavor> getFlavors() {
         return os.compute().flavors().list();
@@ -162,7 +173,7 @@ public class OpenStack4JClient implements OpenStackInterface{
 
     @Override
     public User createUser(String name, String password, String emailId) {
-        Tenant t = os.identity().tenants().getByName(tenant);
+        Tenant t = getTenantByName();
         // Create a User associated to the ABC Corporation tenant
         User user = os.identity().users()
                 .create(new Builders().user()
@@ -176,8 +187,16 @@ public class OpenStack4JClient implements OpenStackInterface{
     }
 
     @Override
-    public Network createNetwork(String name, String tenantName) {
-        return null;
+    public Tenant getTenantByName() {
+        return os.identity().tenants().getByName(tenant);
+    }
+
+    @Override
+    public Network createNetwork(String name) {
+        Tenant tenant = getTenantByName();
+        Network network = os.networking().network()
+                .create(Builders.network().name(name).tenantId(tenant.getId()).build());
+        return network;
     }
 
     @Override
@@ -204,6 +223,11 @@ public class OpenStack4JClient implements OpenStackInterface{
             }
         }
         return null;
+    }
+
+    @Override
+    public void deleteNetwork(Network network) {
+        os.networking().network().delete(network.getId());
     }
 
     /*@Override

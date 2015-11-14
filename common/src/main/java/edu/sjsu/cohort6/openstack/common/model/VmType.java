@@ -12,12 +12,11 @@
  * all copies or substantial portions of the Software.
  */
 
+package edu.sjsu.cohort6.openstack.common.model;
+
 /**
- * This package consists of class files that are used as Data Transfer Objects between Web service and the
- * Web UI.
- *
- * It also decouples the data obtained from OpenStack for consumption by our application.
- *
- * @author rwatsh
+ * @author rwatsh on 11/5/15.
  */
-package edu.sjsu.cohort6.openstack.common.dto;
+public enum VmType {
+    DB, WEB;
+}

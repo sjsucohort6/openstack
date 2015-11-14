@@ -12,38 +12,31 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.common.dto;
+package edu.sjsu.cohort6.openstack.health;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.mongodb.morphia.annotations.Embedded;
+import com.codahale.metrics.health.HealthCheck;
+import edu.sjsu.cohort6.openstack.db.DBClient;
 
-import java.util.Date;
 
 /**
- * Model for storing service logs.
+ * Database health check
  *
- * @author rwatsh on 11/5/15.
+ * Created by rwatsh on 9/18/15.
  */
-@Embedded
-public class ServiceLog {
-    private String message;
-    private Date time;
+public class DBHealthCheck extends HealthCheck{
+    private DBClient client;
 
-    @JsonProperty
-    public Date getTime() {
-        return time;
+    public DBHealthCheck(DBClient client) {
+        this.client = client;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
-    }
+    @Override
+    protected Result check() throws Exception {
 
-    @JsonProperty
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+        if (client.checkHealth()) {
+            return Result.healthy();
+        } else {
+            return Result.unhealthy("Cannot connect to DB " + client.getConnectString());
+        }
     }
 }

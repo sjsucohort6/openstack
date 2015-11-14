@@ -18,7 +18,9 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
-import edu.sjsu.cohort6.openstack.common.dto.Service;
+import edu.sjsu.cohort6.openstack.common.model.Service;
+import edu.sjsu.cohort6.openstack.common.model.ServiceLog;
+import edu.sjsu.cohort6.openstack.common.model.ServiceStatus;
 import edu.sjsu.cohort6.openstack.db.BaseDAO;
 import edu.sjsu.cohort6.openstack.db.DBException;
 import org.mongodb.morphia.Key;
@@ -30,7 +32,9 @@ import org.mongodb.morphia.query.QueryResults;
 import org.mongodb.morphia.query.UpdateOperations;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * DAO for service.
@@ -38,6 +42,7 @@ import java.util.List;
  * @author rwatsh on 11/5/15.
  */
 public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Service> {
+    private static final Logger log = Logger.getLogger(ServiceDAO.class.getName());
     protected Morphia morphia;
 
     protected ServiceDAO(MongoClient mongoClient, Morphia morphia, String dbName) {
@@ -74,11 +79,11 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
             UpdateOperations<Service> ops = this.createUpdateOperations()
                     .set("name", service.getName())
                     .set("tenant", service.getTenant())
-                    .set("type", service.getType())
-                    .set("vms", service.getVms())
+                    .set("type", service.getServiceType())
+                    .set("vms", service.getNodes())
                     .set("logs", service.getLogs());
 
-            Query<Service> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(service.getId());
+            Query<Service> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(service.getName());
             this.update(updateQuery, ops);
         }
     }
@@ -122,5 +127,65 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
         }
         return services;
 
+    }
+
+    /**
+     * Known issue with the below implementation is the service status may switch between ready and in-progress but it
+     * eventually will be set to either FAILED or READY depending on the last job completes with a failure or success.
+     * If the status at anytime has been marked as failed, then it will remain set to failed regardless of other child jobs
+     * of the service being successful or in-progress.
+     *
+     * The service status will be the cumulative status of all jobs that were started for the service.
+     *  @param serviceName
+     *  @param statusToSet
+     */
+    public void updateServiceStatus(final String serviceName, ServiceStatus statusToSet) {
+        try {
+            List<Service> services = fetchById(new ArrayList<String>() {{
+                add(serviceName);
+            }});
+            if (services != null && !services.isEmpty()) {
+                Service s = services.get(0);
+                ServiceStatus status = s.getStatus();
+                switch (statusToSet) {
+                    case FAILED:
+                        s.setStatus(ServiceStatus.FAILED);
+                        break;
+                    case IN_PROGRESS:
+                        if (status != ServiceStatus.FAILED) {
+                            s.setStatus(ServiceStatus.IN_PROGRESS);
+                        }
+                        break;
+                    case READY:
+                        if (status != ServiceStatus.FAILED) {
+                            s.setStatus(ServiceStatus.READY);
+                        }
+                }
+
+                update(new ArrayList<Service>(){{ add(s);}});
+            }
+        } catch (DBException e) {
+            e.printStackTrace();
+            log.severe("Failed to update status for service: " + serviceName);
+        }
+    }
+
+    public void updateServiceLog(final String serviceName, String message) {
+        try {
+            List<Service> services = fetchById(new ArrayList<String>() {{
+                add(serviceName);
+            }});
+            if (services != null && !services.isEmpty()) {
+                Service s = services.get(0);
+                ServiceLog serviceLog = new ServiceLog();
+                serviceLog.setMessage(message);
+                serviceLog.setTime(new Date());
+                s.getLogs().add(serviceLog);
+                update(new ArrayList<Service>(){{ add(s);}});
+            }
+        } catch (DBException e) {
+            e.printStackTrace();
+            log.severe("Failed to update logs for service: " + serviceName);
+        }
     }
 }

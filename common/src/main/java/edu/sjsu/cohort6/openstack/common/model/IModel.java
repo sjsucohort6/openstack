@@ -12,21 +12,12 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.db;
-
-import org.mongodb.morphia.Morphia;
+package edu.sjsu.cohort6.openstack.common.model;
 
 /**
- * Created by rwatsh on 9/20/15.
+ * A marker interface.
+ *
+ * @author rwatsh on 11/13/15.
  */
-public interface DBClient extends AutoCloseable {
-    // Common operations which don't belong in entities.
-    void dropDB(String dbName);
-    void useDB(String dbName);
-    boolean checkHealth();
-    String getConnectString();
-
-    // Gets the entity DAO instance.
-    Object getDAO(Class<? extends BaseDAO> clazz);
-    Morphia getMorphia();
+public interface IModel {
 }

@@ -12,7 +12,7 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.common.dto;
+package edu.sjsu.cohort6.openstack.common.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;

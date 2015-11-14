@@ -31,5 +31,11 @@ public interface JobConstants {
     public static final String NETWORK_NAME = "networkName";
 
     public static final String SERVICE_PAYLOAD = "servicePayload";
-    public static final String CREATE_BASIC_SERVICE = "create-basic-service";
+    public static final String CREATE_SERVICE_JOB = "create-service-job";
+    public static final String CREATE_VM_JOB = "create-vm-job";
+    public static final String VM_PAYLOAD = "vmPayload";
+
+    public static final String X_ID_TENANT_NAME = "X-ID-TENANT-NAME";
+    public static final String OPENSTACK_CLIENT = "openStackClient";
+    public static final String DB_CLIENT = "DBClient";
 }

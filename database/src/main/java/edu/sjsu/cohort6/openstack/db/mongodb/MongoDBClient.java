@@ -17,7 +17,7 @@ package edu.sjsu.cohort6.openstack.db.mongodb;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.mongodb.MongoClient;
-import edu.sjsu.cohort6.openstack.common.dto.Service;
+import edu.sjsu.cohort6.openstack.common.model.Service;
 import edu.sjsu.cohort6.openstack.db.BaseDAO;
 import edu.sjsu.cohort6.openstack.db.DBClient;
 import org.mongodb.morphia.Datastore;
@@ -51,6 +51,7 @@ public class MongoDBClient implements DBClient {
         this.port = port;
         this.dbName = dbName;
         mongoClient = new MongoClient(server, port);
+
         morphia = new Morphia();
         morphia.mapPackageFromClass(Service.class);
         morphiaDatastore = morphia.createDatastore(mongoClient, dbName);
@@ -87,5 +88,10 @@ public class MongoDBClient implements DBClient {
     @Override
     public Morphia getMorphia() {
         return null;
+    }
+
+    @Override
+    public void close() throws Exception {
+        mongoClient.close();
     }
 }

@@ -12,11 +12,20 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.common.dto;
+package edu.sjsu.cohort6.openstack.rest.exception;
 
 /**
- * @author rwatsh on 11/5/15.
+ * Created by rwatsh on 9/23/15.
  */
-public enum ServiceType {
-    BASIC, BIG;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+
+public class InternalErrorException  extends WebApplicationException {
+    public InternalErrorException(){
+        super(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+
+    public InternalErrorException(Throwable throwable){
+        super(Response.Status.INTERNAL_SERVER_ERROR.toString(), throwable);
+    }
 }

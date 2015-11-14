@@ -28,11 +28,11 @@ import java.util.logging.Logger;
  *
  * @author rwatsh on 11/5/15.
  */
-public class MyJobListener extends JobListenerSupport {
+public class AllJobsListener extends JobListenerSupport {
     private String name = null;
-    private static final Logger LOGGER = Logger.getLogger(MyJobListener.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AllJobsListener.class.getName());
 
-    public MyJobListener(String name) {
+    public AllJobsListener(String name) {
         this.name = name;
     }
 

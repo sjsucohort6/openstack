@@ -12,11 +12,11 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.common.dto;
+package edu.sjsu.cohort6.openstack.common.model;
 
 /**
- * @author rwatsh on 11/5/15.
+ * @author rwatsh on 11/13/15.
  */
-public enum VmType {
-    DB, WEB;
+public enum ServiceStatus {
+    FAILED, IN_PROGRESS, READY, TERMINATING;
 }

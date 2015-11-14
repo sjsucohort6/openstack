@@ -27,7 +27,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <spark.version>2.3</spark.version>
+        <dropwizard.version>0.8.4</dropwizard.version>
         <quartz.version>2.2.2</quartz.version>
         <openstack4j.version>2.0.8-SNAPSHOT</openstack4j.version>
         <guice.version>4.0</guice.version>
@@ -52,14 +52,19 @@
             <version>${freemarker.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sparkjava</groupId>
-            <artifactId>spark-template-freemarker</artifactId>
-            <version>${spark.version}</version>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-core</artifactId>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sparkjava</groupId>
-            <artifactId>spark-core</artifactId>
-            <version>${spark.version}</version>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-assets</artifactId>
+            <version>${dropwizard.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-auth</artifactId>
+            <version>${dropwizard.version}</version>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
@@ -85,7 +90,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-            <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.pacesys</groupId>
@@ -107,6 +111,11 @@
             <groupId>edu.sjsu.cohort6.openstack</groupId>
             <artifactId>openstack-client</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <version>1.12</version>
         </dependency>
     </dependencies>
 
@@ -167,7 +176,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>edu.sjsu.cohort6.openstack.web.Application</mainClass>
+                                    <mainClass>edu.sjsu.cohort6.openstack.OpenStackCloudServiceApplication</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

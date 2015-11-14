@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import static org.quartz.JobBuilder.newJob;
+import static org.quartz.JobKey.jobKey;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 import static org.quartz.impl.matchers.GroupMatcher.groupEquals;
+import static org.quartz.impl.matchers.KeyMatcher.keyEquals;
 
 /**
  * Job Manager.
@@ -66,6 +68,19 @@ public class JobManager implements AutoCloseable {
     }
 
     /**
+     * Listener for a specific job.
+     *
+     * @param listener
+     * @param jobName
+     * @param groupName
+     * @throws SchedulerException
+     */
+    public void registerJobListener(JobListener listener, String jobName, String groupName) throws SchedulerException {
+        scheduler.getListenerManager().addJobListener(listener,
+                keyEquals(jobKey(jobName, groupName)));
+    }
+
+    /**
      * Start scheduler.
      *
      * @throws SchedulerException
@@ -85,7 +100,7 @@ public class JobManager implements AutoCloseable {
      * @param jobDataMap
      * @throws SchedulerException
      */
-    public void scheduleJob(Class<? extends Job> jobClazz,
+    public JobDetail scheduleJob(Class<? extends Job> jobClazz,
                             String jobName,
                             String tenantName,
                             JobDataMap jobDataMap) throws SchedulerException {
@@ -103,6 +118,7 @@ public class JobManager implements AutoCloseable {
 
         // Schedule the job with the trigger
         scheduler.scheduleJob(job, trigger);
+        return job;
     }
 
     /**
@@ -135,5 +151,16 @@ public class JobManager implements AutoCloseable {
     public void close() throws Exception {
         //shutdown() does not return until executing Jobs complete execution
         scheduler.shutdown(true);
+    }
+
+    public boolean findJob(String jobName, String tenant) throws SchedulerException {
+        // enumerate each job in group
+        for(JobKey jobKey : scheduler.getJobKeys(groupEquals(tenant))) {
+            LOGGER.info("Found job identified by: " + jobKey);
+            if (jobKey.getName().equalsIgnoreCase(jobName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

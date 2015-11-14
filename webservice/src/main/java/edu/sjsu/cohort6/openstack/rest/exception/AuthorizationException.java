@@ -12,21 +12,16 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.db;
+package edu.sjsu.cohort6.openstack.rest.exception;
 
-import org.mongodb.morphia.Morphia;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 /**
- * Created by rwatsh on 9/20/15.
+ * @author rwatsh on 10/23/15.
  */
-public interface DBClient extends AutoCloseable {
-    // Common operations which don't belong in entities.
-    void dropDB(String dbName);
-    void useDB(String dbName);
-    boolean checkHealth();
-    String getConnectString();
-
-    // Gets the entity DAO instance.
-    Object getDAO(Class<? extends BaseDAO> clazz);
-    Morphia getMorphia();
+public class AuthorizationException extends WebApplicationException {
+    public AuthorizationException(String s) {
+        super(s, Response.Status.FORBIDDEN);
+    }
 }
