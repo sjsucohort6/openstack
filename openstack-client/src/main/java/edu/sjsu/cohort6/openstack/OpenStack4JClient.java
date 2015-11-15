@@ -14,7 +14,6 @@
 
 package edu.sjsu.cohort6.openstack;
 
-import edu.sjsu.cohort6.openstack.common.api.OpenStackInterface;
 import edu.sjsu.cohort6.openstack.common.api.ServiceSpec;
 import edu.sjsu.cohort6.openstack.common.model.Node;
 import edu.sjsu.cohort6.openstack.common.model.Service;

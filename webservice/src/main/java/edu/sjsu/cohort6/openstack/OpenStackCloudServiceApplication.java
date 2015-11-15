@@ -103,6 +103,6 @@ public class OpenStackCloudServiceApplication extends Application<OpenStackCloud
          * Setup CORS filter
          */
         environment.jersey().register(new CORSFilter());
-        environment.jersey().register(serviceResource);
+        environment.jersey().register(ServiceResource.class);
     }
 }

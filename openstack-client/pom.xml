@@ -12,7 +12,7 @@
     <artifactId>openstack-client</artifactId>
 
     <properties>
-        <jclouds.version>1.9.1</jclouds.version>
+        <openstack.version>2.0.8</openstack.version>
     </properties>
 
     <dependencies>
@@ -33,9 +33,13 @@
         <dependency>
             <groupId>org.pacesys</groupId>
             <artifactId>openstack4j</artifactId>
-            <version>2.0.8-SNAPSHOT</version>
+            <version>${openstack.version}</version>
         </dependency>
-
+        <!--<dependency>
+            <groupId>org.pacesys.openstack4j.connectors</groupId>
+            <artifactId>openstack4j-jersey2</artifactId>
+            <version>${openstack.version}</version>
+        </dependency>-->
 
         <!-- Our code module dependencies -->
         <dependency>
@@ -45,13 +49,13 @@
         </dependency>
     </dependencies>
 
-    <repositories>
+    <!--<repositories>
         <repository>
             <id>st-snapshots</id>
             <name>sonatype-snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
-    </repositories>
+    </repositories>-->
     <build>
         <finalName>openstack-client</finalName>
         <plugins>

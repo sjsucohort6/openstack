@@ -14,7 +14,7 @@
 
 package edu.sjsu.cohort6.openstack.job;
 
-import edu.sjsu.cohort6.openstack.common.api.OpenStackInterface;
+import edu.sjsu.cohort6.openstack.OpenStackInterface;
 import edu.sjsu.cohort6.openstack.common.api.ServiceSpec;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Server;

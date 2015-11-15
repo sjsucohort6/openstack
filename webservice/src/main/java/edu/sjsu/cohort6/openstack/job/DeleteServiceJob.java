@@ -28,6 +28,7 @@ import org.quartz.JobExecutionException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Service deletion job. It deletes the service and its constituents in the background.
@@ -64,6 +65,7 @@ public class DeleteServiceJob implements Job {
                 client.deleteNetwork(network);
             }
         } catch (Exception e) {
+            log.log(Level.SEVERE, "Deletion of service failed", e);
             throw new JobExecutionException(e);
         }
     }
