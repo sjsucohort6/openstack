@@ -21,6 +21,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import javax.ws.rs.core.Response;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -116,6 +117,16 @@ public class CommonUtils {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         return mapper.writeValueAsString(object);
+    }
+
+    public static String convertListToJson(List<?> list) throws IOException {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final ObjectMapper mapper = new ObjectMapper();
+
+        mapper.writeValue(out, list);
+
+        final byte[] data = out.toByteArray();
+        return new String(data);
     }
 
     private static String generateMD5Hash(String plaintext) throws NoSuchAlgorithmException {

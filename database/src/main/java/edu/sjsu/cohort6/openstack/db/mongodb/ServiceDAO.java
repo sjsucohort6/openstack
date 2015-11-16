@@ -18,9 +18,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
-import edu.sjsu.cohort6.openstack.common.model.Service;
-import edu.sjsu.cohort6.openstack.common.model.ServiceLog;
-import edu.sjsu.cohort6.openstack.common.model.ServiceStatus;
+import edu.sjsu.cohort6.openstack.common.model.*;
 import edu.sjsu.cohort6.openstack.db.BaseDAO;
 import edu.sjsu.cohort6.openstack.db.DBException;
 import org.mongodb.morphia.Key;
@@ -30,6 +28,7 @@ import org.mongodb.morphia.mapping.Mapper;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.QueryResults;
 import org.mongodb.morphia.query.UpdateOperations;
+import org.openstack4j.model.compute.Server;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,12 +75,32 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
     @Override
     public void update(List<Service> entityList) throws DBException {
         for (Service service : entityList) {
-            UpdateOperations<Service> ops = this.createUpdateOperations()
-                    .set("name", service.getName())
-                    .set("tenant", service.getTenant())
-                    .set("type", service.getServiceType())
-                    .set("vms", service.getNodes())
-                    .set("logs", service.getLogs());
+            List<Service> services = fetchById(new ArrayList<String>() {{add(service.getName());}});
+            Service existingService = null;
+            if (services != null && !services.isEmpty()) {
+                existingService = services.get(0);
+            }
+            UpdateOperations<Service> ops = this.createUpdateOperations();
+                if (service.getName() != null)
+                    ops.set("name", service.getName());
+                if(service.getTenant() != null)
+                    ops.set("tenant", service.getTenant());
+                if(service.getNetworkName() != null)
+                    ops.set("networkName", service.getNetworkName());
+                if(service.getServiceType() != null)
+                    ops.set("serviceType", service.getServiceType());
+                if(service.getNodes() != null) {
+                    // Replace any existing nodes with updated nodes.
+                    // It is assumed the caller is updating any existing nodes or appending (not supported today).
+                    ops.set("nodes", service.getNodes());
+                }
+                if(service.getStatus() != null)
+                    ops.set("status", service.getStatus());
+                if(service.getLogs() != null) {
+                    // Replace logs with updated logs.
+                    // It is assumed the caller is appending the logs.
+                    ops.set("logs", service.getLogs());
+                }
 
             Query<Service> updateQuery = this.createQuery().field(Mapper.ID_KEY).equal(service.getName());
             this.update(updateQuery, ops);
@@ -180,12 +199,64 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
                 ServiceLog serviceLog = new ServiceLog();
                 serviceLog.setMessage(message);
                 serviceLog.setTime(new Date());
-                s.getLogs().add(serviceLog);
+                List<ServiceLog> serviceLogs = s.getLogs();
+                if (serviceLogs == null) {
+                    serviceLogs = new ArrayList<>();
+                }
+                serviceLogs.add(serviceLog);
                 update(new ArrayList<Service>(){{ add(s);}});
             }
         } catch (DBException e) {
             e.printStackTrace();
             log.severe("Failed to update logs for service: " + serviceName);
+        }
+    }
+
+    public void updateNode(Server s) throws DBException {
+        List<Service> services = fetch("{\"nodes.nodeName\":\"" + s.getName() + "\"}");
+        if (services != null && !services.isEmpty()) {
+            Service service = services.get(0);
+            List<Node> nodes = service.getNodes();
+            if (nodes != null) {
+                for (Node node : nodes) {
+                    if (node.getNodeName().equalsIgnoreCase(s.getName())) {
+                        node.setFlavorName(s.getFlavor().getName());
+                        node.setImageName(s.getImage().getName());
+                        node.setNodeStatus(s.getStatus().value());
+                        node.setNodeId(s.getId());
+                        if (s.getStatus() == Server.Status.ERROR) {
+                            node.setStatusDescription(s.getFault().getDetails());
+                            service.setStatus(ServiceStatus.FAILED);
+                        }
+                        break;
+                    }
+                }
+                update(new ArrayList<Service>(){{add(service);}});
+            }
+        }
+    }
+
+    public void addNode(String serviceName, VmType type, Server s) throws DBException {
+        List<Service> services = fetchById(new ArrayList<String>(){{add(serviceName);}});
+        if (services != null && !services.isEmpty()) {
+            Service service = services.get(0);
+
+
+            List<Node> nodes = service.getNodes();
+            if (nodes == null) {
+                nodes = new ArrayList<>();
+            }
+            Node node = new Node();
+            node.setFlavorName(s.getFlavor().getName());
+            node.setNodeId(s.getId());
+            node.setStatusDescription(s.getFault() != null ? s.getFault().getDetails(): "");
+            node.setNodeStatus(s.getStatus().value());
+            node.setImageName(s.getImage().getName());
+            node.setNodeName(s.getName());
+            node.setType(type);
+            nodes.add(node);
+            service.setNodes(nodes);
+            update(new ArrayList<Service>(){{add(service);}});
         }
     }
 }

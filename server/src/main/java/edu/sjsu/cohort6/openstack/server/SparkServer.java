@@ -23,7 +23,10 @@ import edu.sjsu.cohort6.openstack.db.DatabaseModule;
 import edu.sjsu.cohort6.openstack.server.filter.AuthenticationDetails;
 import edu.sjsu.cohort6.openstack.server.job.AllJobsListener;
 import edu.sjsu.cohort6.openstack.server.job.JobManager;
-import edu.sjsu.cohort6.openstack.server.route.ServicePostRoute;
+import edu.sjsu.cohort6.openstack.server.route.service.ServiceDeleteRoute;
+import edu.sjsu.cohort6.openstack.server.route.service.ServiceGetRoute;
+import edu.sjsu.cohort6.openstack.server.route.service.ServiceNameGetRoute;
+import edu.sjsu.cohort6.openstack.server.route.service.ServicePostRoute;
 import lombok.extern.java.Log;
 import org.quartz.SchedulerException;
 
@@ -31,8 +34,7 @@ import java.io.FileInputStream;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-import static spark.Spark.halt;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 /**
  * @author rwatsh on 11/15/15.
@@ -40,7 +42,9 @@ import static spark.Spark.post;
 @Log
 public class SparkServer {
 
-    public static final String VIRTAPP_API_V1_0_SERVICES = "/virtapp/api/v1.0/services";
+    public static final String VIRTAPP_API_V1_0 = "/virtapp/api/v1.0";
+    public static final String VIRTAPP_API_V1_0_SERVICES = VIRTAPP_API_V1_0 + "/services";
+    public static final String VIRTAPP_API_V1_0_SERVICE_NAME = VIRTAPP_API_V1_0_SERVICES + "/:serviceName";
     @Inject
     private DBFactory dbFactory;
 
@@ -68,6 +72,12 @@ public class SparkServer {
             // initialize route handlers.
             log.info("POST " + VIRTAPP_API_V1_0_SERVICES + " handler added");
             post(VIRTAPP_API_V1_0_SERVICES, new ServicePostRoute(dbClient, authDetails));
+            log.info("DELETE " + VIRTAPP_API_V1_0_SERVICE_NAME + " handler added");
+            delete(VIRTAPP_API_V1_0_SERVICE_NAME, new ServiceDeleteRoute(dbClient, authDetails));
+            log.info("GET " + VIRTAPP_API_V1_0_SERVICES + " handler added");
+            get(VIRTAPP_API_V1_0_SERVICES, new ServiceGetRoute(user, password, tenant, dbClient));
+            log.info("GET " + VIRTAPP_API_V1_0_SERVICE_NAME + " handler added");
+            get(VIRTAPP_API_V1_0_SERVICE_NAME, new ServiceNameGetRoute(dbClient, tenant));
 
         } catch (Exception e) {
             halt(HttpConstants.HTTP_INTERNAL_ERR, "Internal error occurred on server, exception is: " + e.toString());
@@ -79,7 +89,7 @@ public class SparkServer {
          * Start the job scheduler.
          */
         JobManager jobManager = JobManager.getInstance();
-        AllJobsListener jobListener = new AllJobsListener("OpenStackJobListener");
+        AllJobsListener jobListener = new AllJobsListener("CreateVMJobListener");
         jobManager.registerJobListener(jobListener);
         jobManager.startScheduler();
     }

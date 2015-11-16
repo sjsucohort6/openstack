@@ -63,6 +63,9 @@ public class DeleteServiceJob implements Job {
                 String networkName = service.getNetworkName();
                 Network network = client.getNetworkByName(networkName);
                 client.deleteNetwork(network);
+
+                // delete from DB.
+                serviceDAO.delete(service);
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, "Deletion of service failed", e);

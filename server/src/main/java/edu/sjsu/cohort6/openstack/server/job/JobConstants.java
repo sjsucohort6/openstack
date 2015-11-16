@@ -38,4 +38,5 @@ public interface JobConstants {
     public static final String X_ID_TENANT_NAME = "X-ID-TENANT-NAME";
     public static final String OPENSTACK_CLIENT = "openStackClient";
     public static final String DB_CLIENT = "DBClient";
+    public static final String VM_ID = "vmId";
 }

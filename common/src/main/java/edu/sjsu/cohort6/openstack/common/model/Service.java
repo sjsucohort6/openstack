@@ -102,6 +102,41 @@ Big service example payload:
 
  }
 
+> db.services.find().pretty()
+{
+	"_id" : "BasicTestServ--813578692",
+	"tenant" : "admin",
+	"serviceType" : "BASIC",
+	"networkName" : "net2",
+	"status" : "READY",
+	"nodes" : [
+		{
+			"flavorName" : "m1.small",
+			"imageName" : "UBUNTU-WEB-IMG",
+			"type" : "WEB",
+			"nodeName" : "testVM",
+			"nodeId" : "-1805609176"
+		},
+		{
+			"flavorName" : "m1.small",
+			"imageName" : "UBUNTU-DB-IMG",
+			"type" : "DB",
+			"nodeName" : "testDBVM-165299483",
+			"nodeId" : "165299483"
+		}
+	],
+	"logs" : [
+		{
+			"message" : "test message",
+			"time" : ISODate("2015-11-16T17:49:00.337Z")
+		},
+		{
+			"message" : "Updated test message -572621322",
+			"time" : ISODate("2015-11-16T17:50:55.303Z")
+		}
+	]
+}
+
 
  * @author rwatsh on 11/7/15.
  */
@@ -114,7 +149,6 @@ public  class Service extends Validable implements IModel {
     @Id
     private String name;
 
-    @Indexed(unique = true)
     private String tenant;
     /*
      * Edition - BASIC or BIG

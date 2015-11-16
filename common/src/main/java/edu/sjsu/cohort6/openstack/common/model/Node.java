@@ -27,6 +27,26 @@ public class Node extends Validable {
     private VmType type;
     private String nodeName;
     private String nodeId;
+    private String nodeStatus;
+    private String statusDescription;
+
+    @JsonProperty
+    public String getStatusDescription() {
+        return statusDescription;
+    }
+
+    public void setStatusDescription(String statusDescription) {
+        this.statusDescription = statusDescription;
+    }
+
+    @JsonProperty
+    public String getNodeStatus() {
+        return nodeStatus;
+    }
+
+    public void setNodeStatus(String nodeStatus) {
+        this.nodeStatus = nodeStatus;
+    }
 
     @JsonProperty
     public String getFlavorName() {

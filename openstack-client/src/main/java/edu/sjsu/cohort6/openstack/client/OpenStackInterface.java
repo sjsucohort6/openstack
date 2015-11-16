@@ -38,6 +38,8 @@ public interface OpenStackInterface extends AutoCloseable {
     public Server startVM(ServiceSpec serviceSpec);
     public List<? extends Flavor> getFlavors();
     public Flavor getFlavorByName(String name);
+    Server getServerByName(String vmName);
+    List<? extends Server> getAllServers();
 
 
     //tenant
@@ -58,4 +60,6 @@ public interface OpenStackInterface extends AutoCloseable {
     public Image getImageByName(String name);
 
     void deleteNetwork(Network network);
+
+
 }

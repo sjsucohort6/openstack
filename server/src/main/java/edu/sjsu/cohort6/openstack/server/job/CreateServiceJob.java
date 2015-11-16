@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author rwatsh on 11/5/15.
  */
-public class CreateServiceJob implements Job {
+public class CreateServiceJob extends BaseServiceJob implements Job {
     private static final Logger LOGGER = Logger.getLogger(CreateServiceJob.class.getName());
 
     @Override
@@ -39,16 +39,19 @@ public class CreateServiceJob implements Job {
         String user = null;
         String password = null;
 
+        JobDataMap jobDataMap = context.getMergedJobDataMap();
+        user = jobDataMap.getString(JobConstants.USER);
+        password = jobDataMap.getString(JobConstants.PASSWORD);
+        tenantName = jobDataMap.getString(JobConstants.TENANT_NAME);
+        dbClient = (DBClient) jobDataMap.get(JobConstants.DB_CLIENT);
+
         try {
-            JobDataMap jobDataMap = context.getMergedJobDataMap();
+
             ServicePayload createServicePayload = (ServicePayload) jobDataMap.get(JobConstants.SERVICE_PAYLOAD);
             if (createServicePayload != null) {
                 serviceName = createServicePayload.getName();
 
-                user = jobDataMap.getString(JobConstants.USER);
-                password = jobDataMap.getString(JobConstants.PASSWORD);
-                tenantName = jobDataMap.getString(JobConstants.TENANT_NAME);
-                dbClient = (DBClient) jobDataMap.get(JobConstants.DB_CLIENT);
+
                 OpenStack4JClient client = new OpenStack4JClient(user, password, tenantName);
                 List<NodePayload> vmPayloads = createServicePayload.getNodes();
 
@@ -66,11 +69,13 @@ public class CreateServiceJob implements Job {
                         // this does not work as session of openstack4j needs to be current in the thread.
                         params.put(JobConstants.USER, user);
                         params.put(JobConstants.PASSWORD, password);
+                        params.put(JobConstants.DB_CLIENT, dbClient);
+                        params.put(JobConstants.VM_ID, num);
                         String jobName = JobConstants.CREATE_VM_JOB + "-" + serviceName + "-" + num++;
                         jobManager.scheduleJob(CreateVMJob.class, jobName, tenantName, params);
 
                         // Attach job listener for tracking the job and updating service metadata in DB.
-                        jobManager.registerJobListener(new OpenStackJobListener(dbClient), jobName, tenantName);
+                        jobManager.registerJobListener(new CreateVMJobListener(dbClient), jobName, tenantName);
                     }
                 } else {
                     throw new OpenStackJobException("At least one node should be specified in Service payload.");
@@ -82,22 +87,8 @@ public class CreateServiceJob implements Job {
 
 
         } catch (Exception e) {
-            JobManager jobManager = null;
-            // provisioning service failed, delete the service
-            try {
-                jobManager = JobManager.getInstance();
-                if (serviceName != null && tenantName != null && dbClient != null && user != null && password != null) {
-                    JobDataMap params = new JobDataMap();
-                    params.put(JobConstants.SERVICE_NAME, serviceName);
-                    params.put(JobConstants.TENANT_NAME, tenantName);
-                    params.put(JobConstants.USER, user);
-                    params.put(JobConstants.PASSWORD, password);
-                    params.put(JobConstants.DB_CLIENT, dbClient);
-                    jobManager.scheduleJob(DeleteServiceJob.class, "delete-service-job-" + serviceName, tenantName, params);
-                }
-            } catch (SchedulerException e1) {
-                e1.printStackTrace();
-            }
+            // provisioning failed delete service.
+            deleteServiceJob(serviceName, user, password, tenantName, dbClient);
 
             throw new JobExecutionException(e);
         }

@@ -17,6 +17,7 @@ package edu.sjsu.cohort6.openstack.server.job;
 import edu.sjsu.cohort6.openstack.client.OpenStack4JClient;
 import edu.sjsu.cohort6.openstack.client.OpenStackInterface;
 import edu.sjsu.cohort6.openstack.client.ServiceSpec;
+import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.server.payload.NodePayload;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Server;
@@ -35,20 +36,24 @@ import java.util.logging.Logger;
  *
  * @author rwatsh on 11/12/15.
  */
-public class CreateVMJob implements Job {
+public class CreateVMJob extends BaseServiceJob implements Job {
     private static final Logger LOGGER = Logger.getLogger(CreateVMJob.class.getName());
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
+
+        JobDataMap jobDataMap = context.getMergedJobDataMap();
+        String serviceName = jobDataMap.getString(JobConstants.SERVICE_NAME);
+        String user = jobDataMap.getString(JobConstants.USER);
+        String password = jobDataMap.getString(JobConstants.PASSWORD);
+        String tenantName = jobDataMap.getString(JobConstants.TENANT_NAME);
+        DBClient dbClient = (DBClient) jobDataMap.get(JobConstants.DB_CLIENT);
         try {
-            JobDataMap jobDataMap = context.getMergedJobDataMap();
+
             NodePayload node = (NodePayload) jobDataMap.get(JobConstants.VM_PAYLOAD);
             String flavorName = node.getFlavorName();
             String imageName = node.getImageName();
             String networkName = jobDataMap.getString(JobConstants.NETWORK_NAME);
-            String serviceName = jobDataMap.getString(JobConstants.SERVICE_NAME);
-            String user = jobDataMap.getString(JobConstants.USER);
-            String password = jobDataMap.getString(JobConstants.PASSWORD);
-            String tenantName = jobDataMap.getString(JobConstants.TENANT_NAME);
+
             //OpenStackInterface client = (OpenStackInterface) jobDataMap.get(JobConstants.OPENSTACK_CLIENT);
             OpenStackInterface client = new OpenStack4JClient(user, password, tenantName);
 
@@ -68,7 +73,7 @@ public class CreateVMJob implements Job {
                     throw new OpenStackJobException("Could not create network " + networkName);
                 }
             }
-            String vmName = MessageFormat.format(JobConstants.WEB_VM_NAME_FORMAT, serviceName, 1);
+            String vmName = getVMName(jobDataMap, serviceName);
             LOGGER.info(MessageFormat.format("Creating VM {0} with flavor {1} and image {2} and network {3}",
                     vmName, f.getName(), image.getName(), net.getName()));
 
@@ -84,7 +89,14 @@ public class CreateVMJob implements Job {
                         ". Current status is: " + server.getStatus().value());
             }*/
         } catch (Exception e) {
+            // Provisioning failed, delete the service.
+            deleteServiceJob(serviceName, user, password, tenantName, dbClient);
+
             throw new JobExecutionException(e);
         }
     }
+
+
+
+
 }

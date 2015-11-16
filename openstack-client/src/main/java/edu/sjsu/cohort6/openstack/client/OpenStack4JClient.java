@@ -127,8 +127,10 @@ public class OpenStack4JClient implements OpenStackInterface{
     public void deleteServers(Service service) {
         if (service != null) {
             List<Node> nodes = service.getNodes();
-            for (Node node: nodes) {
-                os.compute().servers().delete(node.getNodeId());
+            if (nodes != null) {
+                for (Node node : nodes) {
+                    os.compute().servers().delete(node.getNodeId());
+                }
             }
         }
     }
@@ -225,6 +227,24 @@ public class OpenStack4JClient implements OpenStackInterface{
     @Override
     public void deleteNetwork(Network network) {
         os.networking().network().delete(network.getId());
+    }
+
+    @Override
+    public Server getServerByName(String vmName) {
+        List<? extends Server> servers = getAllServers();
+        if (servers != null) {
+            for(Server s: servers) {
+                if(s.getName().equalsIgnoreCase(vmName)) {
+                    return s;
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<? extends Server> getAllServers() {
+        List<? extends Server> servers = os.compute().servers().list();
+        return servers;
     }
 
     /*@Override
