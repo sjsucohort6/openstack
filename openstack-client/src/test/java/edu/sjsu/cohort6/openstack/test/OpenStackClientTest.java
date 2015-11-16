@@ -15,7 +15,7 @@
 package edu.sjsu.cohort6.openstack.test;
 
 //import edu.sjsu.cohort6.openstack.OpenStackClient;
-import edu.sjsu.cohort6.openstack.OpenStackInterface;
+import edu.sjsu.cohort6.openstack.client.OpenStackInterface;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

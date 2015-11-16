@@ -12,7 +12,7 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.job;
+package edu.sjsu.cohort6.openstack.server.job;
 
 import edu.sjsu.cohort6.openstack.client.OpenStack4JClient;
 import edu.sjsu.cohort6.openstack.common.model.Service;

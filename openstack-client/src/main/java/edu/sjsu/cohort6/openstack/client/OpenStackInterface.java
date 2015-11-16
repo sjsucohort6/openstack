@@ -12,9 +12,8 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack;
+package edu.sjsu.cohort6.openstack.client;
 
-import edu.sjsu.cohort6.openstack.common.api.ServiceSpec;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.compute.SimpleTenantUsage;

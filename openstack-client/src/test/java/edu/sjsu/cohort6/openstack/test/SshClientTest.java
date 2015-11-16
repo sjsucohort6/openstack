@@ -14,7 +14,7 @@
 
 package edu.sjsu.cohort6.openstack.test;
 
-import edu.sjsu.cohort6.openstack.SshClient;
+import edu.sjsu.cohort6.openstack.client.SshClient;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

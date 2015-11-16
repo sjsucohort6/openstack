@@ -34,6 +34,7 @@
             <groupId>org.pacesys</groupId>
             <artifactId>openstack4j</artifactId>
             <version>${openstack.version}</version>
+            <classifier>withdeps</classifier>
         </dependency>
         <!--<dependency>
             <groupId>org.pacesys.openstack4j.connectors</groupId>
@@ -105,7 +106,7 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>edu.sjsu.cohort6.openstack.OpenStack4JClient</mainClass>
+                                    <mainClass>edu.sjsu.cohort6.openstack.client.OpenStack4JClient</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

@@ -32,7 +32,7 @@ Authorization header - user creds
 Basic service example payload:
  {
     "name": "BasicServ1",
-    "edition" : "BASIC",
+    "serviceType" : "BASIC",
     "networkName" : "net1",
     "nodes": [
         {
@@ -46,7 +46,7 @@ Basic service example payload:
 Big service example payload:
 {
     "name": "BigServ1",
-    "edition" : "BIG",
+    "serviceType" : "BIG",
     "networkName" : "net1",
     "nodes": [
         {
@@ -66,10 +66,6 @@ Big service example payload:
  In DB:
 
  Attributes marked (*DB only) are not meant to be sent by payload.
- Idea is to keep the payload with some additional information in the DB.
- Payload is a subset of the DB schema and only the data that comes via payload is validated.
-
- TODO Ideally we should separate payload schema from DB schema.
 
  {
     "name": "BigServ1",

@@ -15,7 +15,7 @@
 package edu.sjsu.cohort6.openstack.auth;
 
 import com.google.common.base.Optional;
-import edu.sjsu.cohort6.openstack.OpenStack4JClient;
+import edu.sjsu.cohort6.openstack.client.OpenStack4JClient;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;

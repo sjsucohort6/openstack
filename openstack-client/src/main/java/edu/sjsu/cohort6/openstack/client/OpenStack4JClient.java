@@ -12,9 +12,8 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack;
+package edu.sjsu.cohort6.openstack.client;
 
-import edu.sjsu.cohort6.openstack.common.api.ServiceSpec;
 import edu.sjsu.cohort6.openstack.common.model.Node;
 import edu.sjsu.cohort6.openstack.common.model.Service;
 import org.openstack4j.api.Builders;
@@ -102,7 +101,6 @@ public class OpenStack4JClient implements OpenStackInterface{
 
     @Override
     public void close() throws IOException {
-
     }
 
     /**

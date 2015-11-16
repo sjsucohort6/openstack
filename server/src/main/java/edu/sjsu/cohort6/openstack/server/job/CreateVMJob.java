@@ -12,10 +12,12 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.job;
+package edu.sjsu.cohort6.openstack.server.job;
 
+import edu.sjsu.cohort6.openstack.client.OpenStack4JClient;
 import edu.sjsu.cohort6.openstack.client.OpenStackInterface;
 import edu.sjsu.cohort6.openstack.client.ServiceSpec;
+import edu.sjsu.cohort6.openstack.server.payload.NodePayload;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.image.Image;
@@ -28,8 +30,6 @@ import org.quartz.JobExecutionException;
 import java.text.MessageFormat;
 import java.util.logging.Logger;
 
-import static edu.sjsu.cohort6.openstack.job.JobConstants.WEB_VM_NAME_FORMAT;
-
 /**
  * Create VM Job.
  *
@@ -41,11 +41,16 @@ public class CreateVMJob implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try {
             JobDataMap jobDataMap = context.getMergedJobDataMap();
-            String flavorName = jobDataMap.getString(JobConstants.FLAVOR_NAME);
-            String imageName = jobDataMap.getString(JobConstants.IMAGE_NAME);
+            NodePayload node = (NodePayload) jobDataMap.get(JobConstants.VM_PAYLOAD);
+            String flavorName = node.getFlavorName();
+            String imageName = node.getImageName();
             String networkName = jobDataMap.getString(JobConstants.NETWORK_NAME);
             String serviceName = jobDataMap.getString(JobConstants.SERVICE_NAME);
-            OpenStackInterface client = (OpenStackInterface) jobDataMap.get(JobConstants.OPENSTACK_CLIENT);
+            String user = jobDataMap.getString(JobConstants.USER);
+            String password = jobDataMap.getString(JobConstants.PASSWORD);
+            String tenantName = jobDataMap.getString(JobConstants.TENANT_NAME);
+            //OpenStackInterface client = (OpenStackInterface) jobDataMap.get(JobConstants.OPENSTACK_CLIENT);
+            OpenStackInterface client = new OpenStack4JClient(user, password, tenantName);
 
             Flavor f = client.getFlavorByName(flavorName);
             if (f == null) {
@@ -63,7 +68,7 @@ public class CreateVMJob implements Job {
                     throw new OpenStackJobException("Could not create network " + networkName);
                 }
             }
-            String vmName = MessageFormat.format(WEB_VM_NAME_FORMAT, serviceName, 1);
+            String vmName = MessageFormat.format(JobConstants.WEB_VM_NAME_FORMAT, serviceName, 1);
             LOGGER.info(MessageFormat.format("Creating VM {0} with flavor {1} and image {2} and network {3}",
                     vmName, f.getName(), image.getName(), net.getName()));
 
@@ -72,10 +77,12 @@ public class CreateVMJob implements Job {
             // check if server was created and started.
             if (server == null) {
                 throw new OpenStackJobException("Failed to create server");
-            } else if (!server.getStatus().value().equalsIgnoreCase("running")) {
+            } /*
+            Commenting out - server.getStatus() is null here but server does get created.
+            else if (!server.getStatus().value().equalsIgnoreCase("running")) {
                 throw new OpenStackJobException("Failed to start server " + server.getName() +
                         ". Current status is: " + server.getStatus().value());
-            }
+            }*/
         } catch (Exception e) {
             throw new JobExecutionException(e);
         }

@@ -23,6 +23,8 @@ import edu.sjsu.cohort6.openstack.db.DBClient;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
+import java.text.MessageFormat;
+
 /**
  * Created by rwatsh on 9/20/15.
  */
@@ -32,7 +34,6 @@ public class MongoDBClient implements DBClient {
     private final String dbName;
     private ServiceDAO serviceDAO;
     private Morphia morphia = null;
-    //private static MongoDBClient instance = null;
     private MongoClient mongoClient;
     private Datastore morphiaDatastore;
 
@@ -62,32 +63,43 @@ public class MongoDBClient implements DBClient {
 
     @Override
     public void dropDB(String dbName) {
-
+        morphiaDatastore.getDB().dropDatabase();
     }
 
     @Override
     public void useDB(String dbName) {
-
+        morphiaDatastore = morphia.createDatastore(mongoClient, dbName);
+        morphiaDatastore.ensureIndexes();
     }
 
     @Override
     public boolean checkHealth() {
-        return false;
+        try {
+            mongoClient.listDatabaseNames();
+            return true;
+        } catch(Exception e) {
+            return false;
+        }
     }
 
     @Override
     public String getConnectString() {
-        return null;
+        return MessageFormat.format("DB Connect Info: server [{0}], port [{1}], dbName [{2}]", server, port, dbName);
     }
 
     @Override
     public Object getDAO(Class<? extends BaseDAO> clazz) {
+        if (clazz != null) {
+            if (clazz.getTypeName().equalsIgnoreCase(ServiceDAO.class.getTypeName())) {
+                return serviceDAO;
+            }
+        }
         return null;
     }
 
     @Override
     public Morphia getMorphia() {
-        return null;
+        return morphia;
     }
 
     @Override

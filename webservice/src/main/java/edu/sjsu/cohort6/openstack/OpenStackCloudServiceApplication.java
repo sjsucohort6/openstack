@@ -18,13 +18,10 @@ import edu.sjsu.cohort6.openstack.auth.SimpleAuthenticator;
 import edu.sjsu.cohort6.openstack.auth.User;
 import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.health.DBHealthCheck;
-import edu.sjsu.cohort6.openstack.job.JobManager;
 import edu.sjsu.cohort6.openstack.job.AllJobsListener;
-import edu.sjsu.cohort6.openstack.rest.CORSFilter;
+import edu.sjsu.cohort6.openstack.job.JobManager;
 import edu.sjsu.cohort6.openstack.rest.EndpointUtils;
 import edu.sjsu.cohort6.openstack.rest.ServiceResource;
-import edu.sjsu.cohort6.openstack.rest.filter.CheckRequestFilter;
-import edu.sjsu.cohort6.openstack.rest.filter.ResponseFilter;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.auth.AuthFactory;
@@ -97,12 +94,13 @@ public class OpenStackCloudServiceApplication extends Application<OpenStackCloud
          * Setup jersey environment.
          */
         environment.jersey().setUrlPattern(EndpointUtils.ENDPOINT_ROOT + "/*");
-        environment.jersey().register(CheckRequestFilter.class);
-        environment.jersey().register(ResponseFilter.class);
+        environment.jersey().register(serviceResource);
+        //environment.jersey().register(new CheckRequestFilter());
+        //environment.jersey().register(new ResponseFilter());
         /*
          * Setup CORS filter
          */
-        environment.jersey().register(new CORSFilter());
-        environment.jersey().register(ServiceResource.class);
+        //environment.jersey().register(new CORSFilter());
+
     }
 }

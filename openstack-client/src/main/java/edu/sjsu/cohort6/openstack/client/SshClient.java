@@ -12,7 +12,7 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack;
+package edu.sjsu.cohort6.openstack.client;
 
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;

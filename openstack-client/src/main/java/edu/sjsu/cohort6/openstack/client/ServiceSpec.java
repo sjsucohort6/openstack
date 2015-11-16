@@ -12,10 +12,23 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.common.api;
+package edu.sjsu.cohort6.openstack.client;
 
 /**
  * Represents a service.
+ *
+ * {
+ "name": "BasicServ1",
+ "edition" : "BASIC",
+ "networkName" : "net1",
+ "nodes": [
+ {
+ "flavorName" : "m1.small",
+ "imageName" : "UBUNTU-WEB-IMG",
+ "type" : "WEB"
+ }
+ ]
+ }
  *
  * @author rwatsh
  */

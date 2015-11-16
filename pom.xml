@@ -12,7 +12,8 @@
         <module>common</module>
         <module>openstack-client</module>
         <module>database</module>
-        <module>webservice</module>
+        <!--<module>webservice</module>-->
+        <module>server</module>
     </modules>
 
 

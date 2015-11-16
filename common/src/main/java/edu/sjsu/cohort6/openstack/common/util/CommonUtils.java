@@ -15,6 +15,7 @@
 package edu.sjsu.cohort6.openstack.common.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -113,6 +114,7 @@ public class CommonUtils {
      */
     public static <T> String convertObjectToJson(T object) throws IOException {
         final ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         return mapper.writeValueAsString(object);
     }
 
