@@ -204,6 +204,7 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
                     serviceLogs = new ArrayList<>();
                 }
                 serviceLogs.add(serviceLog);
+                s.setLogs(serviceLogs);
                 update(new ArrayList<Service>(){{ add(s);}});
             }
         } catch (DBException e) {
