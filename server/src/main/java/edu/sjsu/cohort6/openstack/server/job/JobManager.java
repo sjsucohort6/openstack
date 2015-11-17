@@ -19,6 +19,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import static org.quartz.JobBuilder.newJob;
@@ -36,7 +37,7 @@ import static org.quartz.impl.matchers.KeyMatcher.keyEquals;
 public class JobManager implements AutoCloseable {
     private static final Logger LOGGER = Logger.getLogger(JobManager.class.getName());
 
-    public static final String TRIGGER_NAME = "executeNowTrigger";
+    public static final String TRIGGER_NAME = "executeNowTrigger-" + UUID.randomUUID();
     private final Scheduler scheduler;
     private static JobManager instance = null;
 
