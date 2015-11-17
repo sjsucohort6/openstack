@@ -215,6 +215,10 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
 
     public void updateNode(Server s) throws DBException {
         List<Service> services = fetch("{\"nodes.nodeName\":\"" + s.getName() + "\"}");
+        updateNode(s, services);
+    }
+
+    public void updateNode(Server s, List<Service> services) throws DBException {
         if (services != null && !services.isEmpty()) {
             Service service = services.get(0);
             List<Node> nodes = service.getNodes();
@@ -259,5 +263,17 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
             service.setNodes(nodes);
             update(new ArrayList<Service>(){{add(service);}});
         }
+    }
+
+    /**
+     * Update the node if the node is found in the specified service name.
+     *
+     * @param s
+     * @param serviceName
+     * @throws DBException
+     */
+    public void updateNode(Server s, String serviceName) throws DBException {
+        List<Service> services = fetchById(new ArrayList<String>(){{add(serviceName);}});
+        updateNode(s, services);
     }
 }

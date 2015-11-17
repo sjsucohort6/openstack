@@ -14,12 +14,14 @@
 
 package edu.sjsu.cohort6.openstack.server.route.service;
 
+import edu.sjsu.cohort6.openstack.client.OpenStack4JClient;
 import edu.sjsu.cohort6.openstack.common.model.Service;
 import edu.sjsu.cohort6.openstack.common.util.CommonUtils;
 import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.db.mongodb.ServiceDAO;
 import edu.sjsu.cohort6.openstack.server.HttpConstants;
 import lombok.extern.java.Log;
+import org.openstack4j.model.compute.Server;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -33,12 +35,17 @@ import java.util.logging.Level;
  */
 @Log
 public class ServiceNameGetRoute implements Route {
-    private final DBClient dbClient;
+    private final String user;
+    private final String password;
     private final String tenant;
+    private final DBClient dbClient;
 
-    public ServiceNameGetRoute(DBClient dbClient, String tenant) {
-        this.dbClient = dbClient;
+
+    public ServiceNameGetRoute(String user, String password, String tenant, DBClient dbClient) {
+        this.user = user;
+        this.password = password;
         this.tenant = tenant;
+        this.dbClient = dbClient;
     }
 
     @Override
@@ -53,6 +60,14 @@ public class ServiceNameGetRoute implements Route {
             if (services == null || services.isEmpty()) {
                 response.status(HttpConstants.HTTP_NOT_FOUND);
                 return "Service " + serviceName + " is not found";
+            }
+
+            OpenStack4JClient client = new OpenStack4JClient(user, password, tenant);
+
+            List<? extends Server> servers = client.getAllServers();
+
+            for (Server s : servers) {
+                serviceDAO.updateNode(s, serviceName);
             }
             return CommonUtils.convertObjectToJson(services);
         } catch (Exception e) {

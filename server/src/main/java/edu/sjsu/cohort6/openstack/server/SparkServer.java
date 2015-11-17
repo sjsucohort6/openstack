@@ -77,7 +77,7 @@ public class SparkServer {
             log.info("GET " + VIRTAPP_API_V1_0_SERVICES + " handler added");
             get(VIRTAPP_API_V1_0_SERVICES, new ServiceGetRoute(user, password, tenant, dbClient));
             log.info("GET " + VIRTAPP_API_V1_0_SERVICE_NAME + " handler added");
-            get(VIRTAPP_API_V1_0_SERVICE_NAME, new ServiceNameGetRoute(dbClient, tenant));
+            get(VIRTAPP_API_V1_0_SERVICE_NAME, new ServiceNameGetRoute(user, password, tenant, dbClient));
 
         } catch (Exception e) {
             halt(HttpConstants.HTTP_INTERNAL_ERR, "Internal error occurred on server, exception is: " + e.toString());

@@ -32,7 +32,7 @@ import java.util.logging.Level;
  * @author rwatsh on 11/16/15.
  */
 @Log
-public class ServiceGetRoute implements Route {
+public class ServiceGetRoute extends BaseServiceRoute implements Route {
     private final String user;
     private final String password;
     private final String tenant;
@@ -58,6 +58,13 @@ public class ServiceGetRoute implements Route {
                 serviceDAO.updateNode(s);
             }
 
+            // update cumulative service status
+            List<Service> services = serviceDAO.fetchById(null);
+            if (services != null) {
+                for (Service s: services) {
+                    updateCumulativeServiceStatus(s);
+                }
+            }
 
             List<Service> serviceList = serviceDAO.fetchById(null);
             return CommonUtils.convertListToJson(serviceList);
@@ -66,4 +73,6 @@ public class ServiceGetRoute implements Route {
             throw e;
         }
     }
+
+
 }
