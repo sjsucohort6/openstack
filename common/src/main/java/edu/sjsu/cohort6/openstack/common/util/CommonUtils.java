@@ -28,6 +28,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -120,6 +121,10 @@ public class CommonUtils {
     }
 
     public static String convertListToJson(List<?> list) throws IOException {
+        if (list == null) {
+            // return empty list
+            list = new ArrayList<Object>();
+        }
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         final ObjectMapper mapper = new ObjectMapper();
 

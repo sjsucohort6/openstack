@@ -14,6 +14,7 @@
 
 package edu.sjsu.cohort6.openstack.client;
 
+import com.google.inject.assistedinject.Assisted;
 import edu.sjsu.cohort6.openstack.common.model.Node;
 import edu.sjsu.cohort6.openstack.common.model.Service;
 import org.openstack4j.api.Builders;
@@ -47,7 +48,7 @@ public class OpenStack4JClient implements OpenStackInterface{
     private String passwd = null;
     private String tenant = null;
 
-    public OpenStack4JClient(String user, String passwd, String tenant) {
+    public OpenStack4JClient(@Assisted("user")String user, @Assisted("passwd")String passwd, @Assisted("tenant")String tenant) {
         os = authenticateUser(user, passwd, tenant);
         this.user = user;
         this.passwd = passwd;
@@ -124,6 +125,7 @@ public class OpenStack4JClient implements OpenStackInterface{
         return server;
     }
 
+    @Override
     public void deleteServers(Service service) {
         if (service != null) {
             List<Node> nodes = service.getNodes();
@@ -242,6 +244,7 @@ public class OpenStack4JClient implements OpenStackInterface{
         return null;
     }
 
+    @Override
     public List<? extends Server> getAllServers() {
         List<? extends Server> servers = os.compute().servers().list();
         return servers;

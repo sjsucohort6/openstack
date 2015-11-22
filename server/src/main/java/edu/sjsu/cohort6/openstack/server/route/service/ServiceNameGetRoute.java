@@ -34,7 +34,7 @@ import java.util.logging.Level;
  * @author rwatsh on 11/16/15.
  */
 @Log
-public class ServiceNameGetRoute implements Route {
+public class ServiceNameGetRoute extends BaseServiceRoute implements Route {
     private final String user;
     private final String password;
     private final String tenant;
@@ -69,6 +69,9 @@ public class ServiceNameGetRoute implements Route {
             for (Server s : servers) {
                 serviceDAO.updateNode(s, serviceName);
             }
+
+            updateCumulativeServiceStatus(services.get(0), serviceDAO);
+
             return CommonUtils.convertObjectToJson(services);
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error in getting services for tenant " + tenant, e);

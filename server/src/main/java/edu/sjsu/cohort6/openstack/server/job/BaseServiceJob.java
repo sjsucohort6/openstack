@@ -27,7 +27,7 @@ import java.util.logging.Level;
  */
 @Log
 public class BaseServiceJob {
-    public void deleteServiceJob(String serviceName, String user, String password, String tenantName, DBClient dbClient) {
+    protected void deleteServiceJob(String serviceName, String user, String password, String tenantName, DBClient dbClient) {
         JobManager jobManager = null;
         // provisioning service failed, delete the service
         try {
@@ -45,6 +45,8 @@ public class BaseServiceJob {
             log.log(Level.SEVERE, "Error occurred while delete service", e1);
         }
     }
+
+
 
     public static String getVMName(JobDataMap jobDataMap, String serviceName) {
         int vmId = jobDataMap.getInt(JobConstants.VM_ID);

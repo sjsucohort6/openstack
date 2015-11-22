@@ -113,7 +113,7 @@ public class JobManager implements AutoCloseable {
 
         // Define a Trigger that will fire "now", and not repeat
         Trigger trigger = newTrigger()
-                .withIdentity(TRIGGER_NAME + "-" + jobClazz.getTypeName(), tenantName)
+                //.withIdentity(TRIGGER_NAME + "-" + jobClazz.getTypeName(), tenantName)
                 .startNow()
                 .build();
 

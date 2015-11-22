@@ -44,7 +44,7 @@ public class CreateServiceJob extends BaseServiceJob implements Job {
         password = jobDataMap.getString(JobConstants.PASSWORD);
         tenantName = jobDataMap.getString(JobConstants.TENANT_NAME);
         dbClient = (DBClient) jobDataMap.get(JobConstants.DB_CLIENT);
-
+        JobHelper jobHelper = new JobHelper(dbClient);
         try {
 
             ServicePayload createServicePayload = (ServicePayload) jobDataMap.get(JobConstants.SERVICE_PAYLOAD);
@@ -78,15 +78,22 @@ public class CreateServiceJob extends BaseServiceJob implements Job {
                         jobManager.registerJobListener(new CreateVMJobListener(dbClient), jobName, tenantName);
                     }
                 } else {
-                    throw new OpenStackJobException("At least one node should be specified in Service payload.");
+
+                    String message = "Request failed: At least one node should be specified in Service payload.";
+                    jobHelper.saveTaskInfo(context, message);
+                    throw new OpenStackJobException(message);
+
                 }
             } else {
-                throw new OpenStackJobException("Service not specified");
+                String message = "Service not specified";
+                jobHelper.saveTaskInfo(context, message);
+                throw new OpenStackJobException(message);
             }
             // TODO add health check for web server and DB server with retries.
 
 
         } catch (Exception e) {
+            jobHelper.saveTaskInfo(context, "Request failed, caused by: " + e.toString());
             // provisioning failed delete service.
             deleteServiceJob(serviceName, user, password, tenantName, dbClient);
 

@@ -32,11 +32,22 @@
         <lombok.version>1.16.6</lombok.version>
         <guava.version>18.0</guava.version>
         <quartz.version>2.2.2</quartz.version>
+        <freemarker.version>2.3.23</freemarker.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>com.sparkjava</groupId>
             <artifactId>spark-core</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>${freemarker.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-template-freemarker</artifactId>
             <version>${spark.version}</version>
         </dependency>
         <dependency>

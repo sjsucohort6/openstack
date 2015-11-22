@@ -17,16 +17,20 @@ package edu.sjsu.cohort6.openstack.server;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Module;
+import edu.sjsu.cohort6.openstack.client.OpenStackClientFactory;
 import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.db.DBFactory;
 import edu.sjsu.cohort6.openstack.db.DatabaseModule;
 import edu.sjsu.cohort6.openstack.server.filter.AuthenticationDetails;
 import edu.sjsu.cohort6.openstack.server.job.AllJobsListener;
 import edu.sjsu.cohort6.openstack.server.job.JobManager;
+import edu.sjsu.cohort6.openstack.server.route.quota.QuotaGetRoute;
 import edu.sjsu.cohort6.openstack.server.route.service.ServiceDeleteRoute;
 import edu.sjsu.cohort6.openstack.server.route.service.ServiceGetRoute;
 import edu.sjsu.cohort6.openstack.server.route.service.ServiceNameGetRoute;
 import edu.sjsu.cohort6.openstack.server.route.service.ServicePostRoute;
+import edu.sjsu.cohort6.openstack.server.route.task.TaskGetRoute;
+import edu.sjsu.cohort6.openstack.server.view.MainView;
 import lombok.extern.java.Log;
 import org.quartz.SchedulerException;
 
@@ -34,6 +38,7 @@ import java.io.FileInputStream;
 import java.text.MessageFormat;
 import java.util.Properties;
 
+import static edu.sjsu.cohort6.openstack.server.HttpConstants.*;
 import static spark.Spark.*;
 
 /**
@@ -42,11 +47,10 @@ import static spark.Spark.*;
 @Log
 public class SparkServer {
 
-    public static final String VIRTAPP_API_V1_0 = "/virtapp/api/v1.0";
-    public static final String VIRTAPP_API_V1_0_SERVICES = VIRTAPP_API_V1_0 + "/services";
-    public static final String VIRTAPP_API_V1_0_SERVICE_NAME = VIRTAPP_API_V1_0_SERVICES + "/:serviceName";
     @Inject
     private DBFactory dbFactory;
+    @Inject
+    private OpenStackClientFactory openStackClientFactory;
 
     public static void main(String[] args) {
         Properties props = new Properties();
@@ -59,6 +63,7 @@ public class SparkServer {
             String dbName = props.getProperty("dbName", "openstack_db");
             DBClient dbClient = app.initDB(dbServer, dbPort, dbName);
             app.initJobManager();
+            staticFileLocation(WWW_DIR);
 
             //before(new BasicAuthenticationFilter("/api/*",
             // new AuthenticationDetails("expected-username", "expected-password")));
@@ -79,8 +84,17 @@ public class SparkServer {
             log.info("GET " + VIRTAPP_API_V1_0_SERVICE_NAME + " handler added");
             get(VIRTAPP_API_V1_0_SERVICE_NAME, new ServiceNameGetRoute(user, password, tenant, dbClient));
 
+            log.info("GET " + VIRTAPP_API_V1_0_TASKS + " handler added");
+            get(VIRTAPP_API_V1_0_TASKS, new TaskGetRoute(user, password, tenant, dbClient));
+
+            log.info("GET " + VIRTAPP_API_V1_0_QUOTA + " handler added");
+            get(VIRTAPP_API_V1_0_QUOTA, new QuotaGetRoute(user, password, tenant, dbClient));
+
+            // initialize the views.
+            MainView view = new MainView(dbClient);
+
         } catch (Exception e) {
-            halt(HttpConstants.HTTP_INTERNAL_ERR, "Internal error occurred on server, exception is: " + e.toString());
+            halt(HTTP_INTERNAL_ERR, "Internal error occurred on server, exception is: " + e.toString());
         }
     }
 

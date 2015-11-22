@@ -17,7 +17,10 @@ package edu.sjsu.cohort6.openstack.server.route.service;
 import edu.sjsu.cohort6.openstack.common.model.Node;
 import edu.sjsu.cohort6.openstack.common.model.Service;
 import edu.sjsu.cohort6.openstack.common.model.ServiceStatus;
+import edu.sjsu.cohort6.openstack.db.DBException;
+import edu.sjsu.cohort6.openstack.db.mongodb.ServiceDAO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,8 +33,9 @@ public abstract class BaseServiceRoute {
      * Update cumulative service status based on status of VMs that are part of the service.
      *
      * @param s service instance.
+     * @param serviceDAO
      */
-    protected void updateCumulativeServiceStatus(Service s) {
+    protected void updateCumulativeServiceStatus(Service s, ServiceDAO serviceDAO) throws DBException {
         List<Node> nodes = s.getNodes();
         if (nodes != null) {
             boolean failed = false;
@@ -55,6 +59,7 @@ public abstract class BaseServiceRoute {
             if(!failed && !inProgress) {
                 s.setStatus(ServiceStatus.READY);
             }
+            serviceDAO.update(new ArrayList<Service>(){{add(s);}});
         }
     }
 }

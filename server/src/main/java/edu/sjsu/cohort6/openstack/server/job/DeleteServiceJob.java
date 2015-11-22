@@ -20,12 +20,12 @@ import edu.sjsu.cohort6.openstack.common.model.ServiceStatus;
 import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.db.mongodb.ServiceDAO;
 import lombok.extern.java.Log;
-import org.openstack4j.model.network.Network;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,18 +39,23 @@ import java.util.logging.Level;
 public class DeleteServiceJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
+        JobDataMap jobDataMap = context.getMergedJobDataMap();
+        String user = jobDataMap.getString(JobConstants.USER);
+        String password = jobDataMap.getString(JobConstants.PASSWORD);
+        String tenantName = jobDataMap.getString(JobConstants.TENANT_NAME);
+        DBClient dbClient = (DBClient) jobDataMap.get(JobConstants.DB_CLIENT);
+        String serviceName = jobDataMap.getString(JobConstants.SERVICE_NAME);
+        JobHelper jobHelper = new JobHelper(dbClient);
+
         try {
-            JobDataMap jobDataMap = context.getMergedJobDataMap();
-            String user = jobDataMap.getString(JobConstants.USER);
-            String password = jobDataMap.getString(JobConstants.PASSWORD);
-            String tenantName = jobDataMap.getString(JobConstants.TENANT_NAME);
-            DBClient dbClient = (DBClient) jobDataMap.get(JobConstants.DB_CLIENT);
-            String serviceName = jobDataMap.getString(JobConstants.SERVICE_NAME);
+
             OpenStack4JClient client = new OpenStack4JClient(user, password, tenantName);
 
             ServiceDAO serviceDAO = (ServiceDAO) dbClient.getDAO(ServiceDAO.class);
             serviceDAO.updateServiceStatus(serviceName, ServiceStatus.TERMINATING);
-            serviceDAO.updateServiceLog(serviceName, "Service " + serviceName + " is being terminated");
+            String message = "Service " + serviceName + " is being terminated";
+            serviceDAO.updateServiceLog(serviceName, message);
+            jobHelper.saveTaskInfo(context, message);
             List<Service> services = serviceDAO.fetchById(new ArrayList<String>() {{
                 add(serviceName);
             }});
@@ -59,16 +64,21 @@ public class DeleteServiceJob implements Job {
 
                 // delete servers
                 client.deleteServers(service);
-                // delete network
-                String networkName = service.getNetworkName();
-                Network network = client.getNetworkByName(networkName);
-                client.deleteNetwork(network);
 
                 // delete from DB.
                 serviceDAO.delete(service);
+
+                message = "Service " + serviceName + " is terminated.";
+                serviceDAO.updateServiceLog(serviceName, message);
+                jobHelper.saveTaskInfo(context, message);
+            } else {
+                throw new OpenStackJobException(MessageFormat.format("Service {0} not found", serviceName));
             }
         } catch (Exception e) {
             log.log(Level.SEVERE, "Deletion of service failed", e);
+            jobHelper.saveTaskInfo(context, MessageFormat.format("Delete failed for service {0}: {1}",
+                    serviceName, e.toString()));
+
             throw new JobExecutionException(e);
         }
     }

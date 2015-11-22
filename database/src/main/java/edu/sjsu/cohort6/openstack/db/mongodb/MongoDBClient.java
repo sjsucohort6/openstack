@@ -33,6 +33,7 @@ public class MongoDBClient implements DBClient {
     private final int port;
     private final String dbName;
     private ServiceDAO serviceDAO;
+    private TaskDAO taskDAO;
     private Morphia morphia = null;
     private MongoClient mongoClient;
     private Datastore morphiaDatastore;
@@ -58,7 +59,7 @@ public class MongoDBClient implements DBClient {
         morphiaDatastore = morphia.createDatastore(mongoClient, dbName);
         morphiaDatastore.ensureIndexes();
         serviceDAO = new ServiceDAO(mongoClient, morphia, dbName);
-
+        taskDAO = new TaskDAO(mongoClient, morphia, dbName);
     }
 
     @Override
@@ -92,6 +93,8 @@ public class MongoDBClient implements DBClient {
         if (clazz != null) {
             if (clazz.getTypeName().equalsIgnoreCase(ServiceDAO.class.getTypeName())) {
                 return serviceDAO;
+            } else if (clazz.getTypeName().equalsIgnoreCase(TaskDAO.class.getTypeName())) {
+                return taskDAO;
             }
         }
         return null;
@@ -105,5 +108,14 @@ public class MongoDBClient implements DBClient {
     @Override
     public void close() throws Exception {
         mongoClient.close();
+    }
+
+    @Override
+    public String toString() {
+        return "MongoDBClient{" +
+                "server='" + server + '\'' +
+                ", port=" + port +
+                ", dbName='" + dbName + '\'' +
+                '}';
     }
 }

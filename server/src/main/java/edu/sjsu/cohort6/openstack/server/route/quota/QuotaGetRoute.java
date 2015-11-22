@@ -12,33 +12,33 @@
  * all copies or substantial portions of the Software.
  */
 
-package edu.sjsu.cohort6.openstack.server.route.service;
+package edu.sjsu.cohort6.openstack.server.route.quota;
 
 import edu.sjsu.cohort6.openstack.client.OpenStack4JClient;
-import edu.sjsu.cohort6.openstack.common.model.Service;
 import edu.sjsu.cohort6.openstack.common.util.CommonUtils;
 import edu.sjsu.cohort6.openstack.db.DBClient;
-import edu.sjsu.cohort6.openstack.db.mongodb.ServiceDAO;
 import lombok.extern.java.Log;
-import org.openstack4j.model.compute.Server;
+import org.openstack4j.model.compute.SimpleTenantUsage;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.util.List;
 import java.util.logging.Level;
 
 /**
- * @author rwatsh on 11/16/15.
+ * Get the tenant quota usage information.
+ *
+ * @author rwatsh on 11/20/15.
  */
 @Log
-public class ServiceGetRoute extends BaseServiceRoute implements Route {
+public class QuotaGetRoute implements Route {
+
     private final String user;
     private final String password;
     private final String tenant;
     private final DBClient dbClient;
 
-    public ServiceGetRoute(String user, String password, String tenant, DBClient dbClient) {
+    public QuotaGetRoute(String user, String password, String tenant, DBClient dbClient) {
         this.user = user;
         this.password = password;
         this.tenant = tenant;
@@ -47,32 +47,14 @@ public class ServiceGetRoute extends BaseServiceRoute implements Route {
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
-
         try {
             OpenStack4JClient client = new OpenStack4JClient(user, password, tenant);
-            ServiceDAO serviceDAO = (ServiceDAO) dbClient.getDAO(ServiceDAO.class);
-
-            List<? extends Server> servers = client.getAllServers();
-
-            for (Server s : servers) {
-                serviceDAO.updateNode(s);
-            }
-
-            // update cumulative service status
-            List<Service> services = serviceDAO.fetchById(null);
-            if (services != null) {
-                for (Service s: services) {
-                    updateCumulativeServiceStatus(s, serviceDAO);
-                }
-            }
-
-            List<Service> serviceList = serviceDAO.fetchById(null);
-            return CommonUtils.convertListToJson(serviceList);
+            SimpleTenantUsage usage = client.getQuotaForTenant();
+            return CommonUtils.convertObjectToJson(usage);
         } catch (Exception e) {
-            log.log(Level.SEVERE, "Error in getting services for tenant " + tenant, e);
+            log.log(Level.SEVERE, "Error in getting quota for tenant " + tenant, e);
             throw e;
         }
+
     }
-
-
 }

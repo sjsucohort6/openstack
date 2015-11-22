@@ -26,5 +26,11 @@ public interface HttpConstants {
     public static final int HTTP_ACCEPTED = 202;
     public static final int HTTP_NOT_FOUND = 404;
     public static final int HTTP_INTERNAL_ERR = 500;
+    String VIRTAPP_API_V1_0 = "/virtapp/api/v1.0";
+    String VIRTAPP_API_V1_0_TASKS = VIRTAPP_API_V1_0 + "/tasks";
+    String VIRTAPP_API_V1_0_QUOTA = VIRTAPP_API_V1_0 + "/quota";
+    String VIRTAPP_API_V1_0_SERVICES = VIRTAPP_API_V1_0 + "/services";
+    String VIRTAPP_API_V1_0_SERVICE_NAME = VIRTAPP_API_V1_0_SERVICES + "/:serviceName";
+    String WWW_DIR = "/public";
 }
 

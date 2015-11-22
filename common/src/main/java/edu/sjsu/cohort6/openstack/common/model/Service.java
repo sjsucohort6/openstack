@@ -19,6 +19,7 @@ import edu.sjsu.cohort6.openstack.common.api.Validable;
 import edu.sjsu.cohort6.openstack.common.api.ValidationException;
 import org.mongodb.morphia.annotations.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //import lombok.Data;
@@ -167,10 +168,10 @@ public  class Service extends Validable implements IModel {
      * VM payload for each node in the service.
      */
     @Embedded
-    private List<Node> nodes;
+    private List<Node> nodes = new ArrayList<Node>();
 
     @Embedded
-    private List<ServiceLog> logs;
+    private List<ServiceLog> logs = new ArrayList<ServiceLog>();
 
     @JsonProperty
     public String getName() {
@@ -242,7 +243,7 @@ public  class Service extends Validable implements IModel {
      */
     @Override
     public boolean isValid() throws ValidationException {
-        boolean valid =  isReqd(name) && isReqd(nodes) && isReqd(serviceType) && isReqd(networkName);
+        boolean valid =  true;//isReqd(name) && isReqd(nodes) && isReqd(serviceType) && isReqd(networkName);
         if (valid) {
             for (Node node: nodes) {
                 valid = node.isValid();

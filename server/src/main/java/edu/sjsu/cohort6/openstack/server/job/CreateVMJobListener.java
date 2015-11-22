@@ -19,6 +19,7 @@ import edu.sjsu.cohort6.openstack.common.model.ServiceStatus;
 import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.db.DBException;
 import edu.sjsu.cohort6.openstack.db.mongodb.ServiceDAO;
+import edu.sjsu.cohort6.openstack.db.mongodb.TaskDAO;
 import edu.sjsu.cohort6.openstack.server.payload.NodePayload;
 import lombok.extern.java.Log;
 import org.openstack4j.model.compute.Server;
@@ -31,12 +32,16 @@ import org.quartz.*;
  */
 @Log
 public class CreateVMJobListener implements JobListener{
+    private final JobHelper jobHelper;
     private DBClient dbClient;
     private ServiceDAO serviceDAO;
+    private TaskDAO taskDAO;
 
     public CreateVMJobListener(DBClient dbClient) {
         this.dbClient = dbClient;
         this.serviceDAO = (ServiceDAO) dbClient.getDAO(ServiceDAO.class);
+        this.taskDAO = (TaskDAO) dbClient.getDAO(TaskDAO.class);
+        this.jobHelper = new JobHelper(dbClient);
     }
 
     @Override
@@ -52,7 +57,7 @@ public class CreateVMJobListener implements JobListener{
                 " for tenant " + jobDetail.getJobDataMap().getString(JobConstants.TENANT_NAME) +
                 " for service " + serviceName;
         log.info(msg);
-
+        jobHelper.saveTaskInfo(context, msg);
         serviceDAO.updateServiceStatus(serviceName, ServiceStatus.IN_PROGRESS);
         serviceDAO.updateServiceLog(serviceName, msg);
     }
@@ -65,6 +70,7 @@ public class CreateVMJobListener implements JobListener{
                 " for tenant " + jobDetail.getJobDataMap().getString(JobConstants.TENANT_NAME) +
                 " for service " + serviceName;
         log.info(msg);
+        jobHelper.saveTaskInfo(context, msg);
         //For simplicity lets mark it as failed. We could have had a CANCELED status.
         serviceDAO.updateServiceStatus(serviceName, ServiceStatus.FAILED);
         serviceDAO.updateServiceLog(serviceName, msg);
@@ -79,7 +85,11 @@ public class CreateVMJobListener implements JobListener{
         String msg = "Job completed executing: " + jobDetail.getKey().getName() +
                 " for tenant " + tenant +
                 " for service " + serviceName;
+        if (jobException != null && !jobException.getMessage().equals("")) {
+            msg += " Error: " + jobException.getMessage();
+        }
         log.info(msg);
+        jobHelper.saveTaskInfo(context, msg);
         // Job completed successfully
         String vmName = BaseServiceJob.getVMName(jobDataMap, serviceName);
         String user = jobDataMap.getString(JobConstants.USER);
@@ -95,7 +105,7 @@ public class CreateVMJobListener implements JobListener{
             e.printStackTrace();
         }
 
-        /*if (s.getStatus().value().equalsIgnoreCase("error")) {
+        /*if (s.getMessage().value().equalsIgnoreCase("error")) {
             serviceDAO.updateServiceStatus(serviceName, ServiceStatus.FAILED);
             serviceDAO.updateServiceLog(serviceName, MessageFormat.format("VM {0} is in error state, reason: {1}. Please refer to horizon UI for details.", vmName, s.getFault().getMessage()));
         } else {

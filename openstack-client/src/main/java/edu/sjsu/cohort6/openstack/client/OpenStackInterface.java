@@ -14,6 +14,7 @@
 
 package edu.sjsu.cohort6.openstack.client;
 
+import edu.sjsu.cohort6.openstack.common.model.Service;
 import org.openstack4j.model.compute.Flavor;
 import org.openstack4j.model.compute.Server;
 import org.openstack4j.model.compute.SimpleTenantUsage;
@@ -36,6 +37,9 @@ public interface OpenStackInterface extends AutoCloseable {
 
     //server
     public Server startVM(ServiceSpec serviceSpec);
+
+    void deleteServers(Service service);
+
     public List<? extends Flavor> getFlavors();
     public Flavor getFlavorByName(String name);
     Server getServerByName(String vmName);

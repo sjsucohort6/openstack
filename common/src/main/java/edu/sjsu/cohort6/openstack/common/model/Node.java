@@ -95,6 +95,6 @@ public class Node extends Validable {
 
     @Override
     public boolean isValid() throws ValidationException {
-        return isReqd(flavorName) && isReqd(imageName) && isReqd(type);
+        return true; //isReqd(flavorName) && isReqd(imageName) && isReqd(type);
     }
 }
