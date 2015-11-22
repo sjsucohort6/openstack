@@ -17,7 +17,6 @@ package edu.sjsu.cohort6.openstack.server;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Module;
-import edu.sjsu.cohort6.openstack.client.OpenStackClientFactory;
 import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.db.DBFactory;
 import edu.sjsu.cohort6.openstack.db.DatabaseModule;
@@ -33,6 +32,9 @@ import edu.sjsu.cohort6.openstack.server.route.task.TaskGetRoute;
 import edu.sjsu.cohort6.openstack.server.view.MainView;
 import lombok.extern.java.Log;
 import org.quartz.SchedulerException;
+import spark.Filter;
+import spark.Request;
+import spark.Response;
 
 import java.io.FileInputStream;
 import java.text.MessageFormat;
@@ -49,19 +51,18 @@ public class SparkServer {
 
     @Inject
     private DBFactory dbFactory;
-    @Inject
-    private OpenStackClientFactory openStackClientFactory;
 
     public static void main(String[] args) {
         Properties props = new Properties();
         try {
             props.load(new FileInputStream("config.properties"));
-
             SparkServer app = new SparkServer();
+
             String dbServer = props.getProperty("dbHost", "localhost");
             int dbPort = Integer.parseInt(props.getProperty("dbPort", "27017"));
             String dbName = props.getProperty("dbName", "openstack_db");
             DBClient dbClient = app.initDB(dbServer, dbPort, dbName);
+
             app.initJobManager();
             staticFileLocation(WWW_DIR);
 
@@ -90,8 +91,13 @@ public class SparkServer {
             log.info("GET " + VIRTAPP_API_V1_0_QUOTA + " handler added");
             get(VIRTAPP_API_V1_0_QUOTA, new QuotaGetRoute(user, password, tenant, dbClient));
 
+            enableCORS("*", "*", "*");
+
+
             // initialize the views.
             MainView view = new MainView(dbClient);
+
+
 
         } catch (Exception e) {
             halt(HTTP_INTERNAL_ERR, "Internal error occurred on server, exception is: " + e.toString());
@@ -114,6 +120,17 @@ public class SparkServer {
         Guice.createInjector(module).injectMembers(this);
         DBClient dbClient = dbFactory.create(server, port, dbName);
         return dbClient;
+    }
+
+    private static void enableCORS(final String origin, final String methods, final String headers) {
+        before(new Filter() {
+            @Override
+            public void handle(Request request, Response response) {
+                response.header("Access-Control-Allow-Origin", origin);
+                response.header("Access-Control-Request-Method", methods);
+                response.header("Access-Control-Allow-Headers", headers);
+            }
+        });
     }
 
 }

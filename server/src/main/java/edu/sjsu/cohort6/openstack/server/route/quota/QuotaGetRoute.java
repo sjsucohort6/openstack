@@ -17,6 +17,7 @@ package edu.sjsu.cohort6.openstack.server.route.quota;
 import edu.sjsu.cohort6.openstack.client.OpenStack4JClient;
 import edu.sjsu.cohort6.openstack.common.util.CommonUtils;
 import edu.sjsu.cohort6.openstack.db.DBClient;
+import edu.sjsu.cohort6.openstack.server.HttpConstants;
 import lombok.extern.java.Log;
 import org.openstack4j.model.compute.SimpleTenantUsage;
 import spark.Request;
@@ -50,6 +51,7 @@ public class QuotaGetRoute implements Route {
         try {
             OpenStack4JClient client = new OpenStack4JClient(user, password, tenant);
             SimpleTenantUsage usage = client.getQuotaForTenant();
+            response.type(HttpConstants.APPLICATION_JSON);
             return CommonUtils.convertObjectToJson(usage);
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error in getting quota for tenant " + tenant, e);

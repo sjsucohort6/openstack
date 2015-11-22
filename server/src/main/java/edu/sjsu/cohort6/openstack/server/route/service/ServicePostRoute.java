@@ -112,10 +112,6 @@ public class ServicePostRoute implements Route {
         Service service = new Service();
         service.setTenant(tenant);
         service.setStatus(ServiceStatus.IN_PROGRESS);
-        /*ServiceLog serviceLog = new ServiceLog();
-        *//*serviceLog.setMessage("Starting to provision service");
-        serviceLog.setTime(new Date());*//*
-        service.setLogs(new ArrayList<ServiceLog>(){{add(serviceLog);}});*/
         service.setName(serviceName);
         service.setNetworkName(createServicePayload.getNetworkName());
         service.setServiceType(createServicePayload.getServiceType());

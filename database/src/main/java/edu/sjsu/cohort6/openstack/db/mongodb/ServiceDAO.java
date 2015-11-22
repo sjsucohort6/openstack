@@ -91,7 +91,7 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
                     ops.set("serviceType", service.getServiceType());
                 if(service.getNodes() != null) {
                     // Replace any existing nodes with updated nodes.
-                    // It is assumed the caller is updating any existing nodes or appending (not supported today).
+                    // It is assumed the caller is updating any existing nodes or appending.
                     ops.set("nodes", service.getNodes());
                 }
                 if(service.getStatus() != null)
@@ -222,9 +222,11 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
         if (services != null && !services.isEmpty()) {
             Service service = services.get(0);
             List<Node> nodes = service.getNodes();
+            boolean foundExistingNode = false;
             if (nodes != null) {
                 for (Node node : nodes) {
                     if (node.getNodeName().equalsIgnoreCase(s.getName())) {
+                        foundExistingNode = true;
                         node.setFlavorName(s.getFlavor().getName());
                         node.setImageName(s.getImage().getName());
                         node.setNodeStatus(s.getStatus().value());
@@ -236,7 +238,26 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
                         break;
                     }
                 }
-                update(new ArrayList<Service>(){{add(service);}});
+                if (foundExistingNode) {
+                    update(new ArrayList<Service>() {{
+                        add(service);
+                    }});
+                } else {
+                    // Should not generally require this... but adding just in case we missed to add a node
+                    // then we do an upsert (insert while updating).
+
+                    // TODO revisit this .., it may not be needed ??
+                    String vmName = s.getName();
+                    VmType type = null;
+                    if (vmName.contains("_web_")) {
+                        type = VmType.WEB;
+                    } else if(vmName.contains("_db_")) {
+                        type = VmType.DB;
+                    }
+                    if (type != null) {
+                        addNode(service.getName(), type, s);
+                    }
+                }
             }
         }
     }

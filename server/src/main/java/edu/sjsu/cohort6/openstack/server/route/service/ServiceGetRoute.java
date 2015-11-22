@@ -19,6 +19,7 @@ import edu.sjsu.cohort6.openstack.common.model.Service;
 import edu.sjsu.cohort6.openstack.common.util.CommonUtils;
 import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.db.mongodb.ServiceDAO;
+import edu.sjsu.cohort6.openstack.server.HttpConstants;
 import lombok.extern.java.Log;
 import org.openstack4j.model.compute.Server;
 import spark.Request;
@@ -67,6 +68,7 @@ public class ServiceGetRoute extends BaseServiceRoute implements Route {
             }
 
             List<Service> serviceList = serviceDAO.fetchById(null);
+            response.type(HttpConstants.APPLICATION_JSON);
             return CommonUtils.convertListToJson(serviceList);
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error in getting services for tenant " + tenant, e);

@@ -53,6 +53,7 @@ public class ServiceDeleteRoute extends BaseServiceJob implements Route {
             String serviceName = request.params(":serviceName");
             deleteServiceJob(serviceName, user, password, tenant, dbClient);
             response.status(HttpConstants.HTTP_OK);
+            response.type(HttpConstants.APPLICATION_JSON);
             return "Deletion scheduled for service " + serviceName;
         } catch (Exception e) {
             response.status(HTTP_BAD_REQUEST);

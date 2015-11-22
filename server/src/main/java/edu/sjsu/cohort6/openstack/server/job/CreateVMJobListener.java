@@ -103,6 +103,8 @@ public class CreateVMJobListener implements JobListener{
             serviceDAO.addNode(serviceName, node.getType(), s);
         } catch (DBException e) {
             e.printStackTrace();
+            jobHelper.saveTaskInfo(context, msg);
+
         }
 
         /*if (s.getMessage().value().equalsIgnoreCase("error")) {

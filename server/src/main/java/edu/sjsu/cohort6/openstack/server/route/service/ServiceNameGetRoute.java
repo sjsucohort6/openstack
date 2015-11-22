@@ -15,6 +15,7 @@
 package edu.sjsu.cohort6.openstack.server.route.service;
 
 import edu.sjsu.cohort6.openstack.client.OpenStack4JClient;
+import edu.sjsu.cohort6.openstack.client.OpenStackInterface;
 import edu.sjsu.cohort6.openstack.common.model.Service;
 import edu.sjsu.cohort6.openstack.common.util.CommonUtils;
 import edu.sjsu.cohort6.openstack.db.DBClient;
@@ -62,7 +63,7 @@ public class ServiceNameGetRoute extends BaseServiceRoute implements Route {
                 return "Service " + serviceName + " is not found";
             }
 
-            OpenStack4JClient client = new OpenStack4JClient(user, password, tenant);
+            OpenStackInterface client = new OpenStack4JClient(user, password, tenant);
 
             List<? extends Server> servers = client.getAllServers();
 
@@ -71,7 +72,7 @@ public class ServiceNameGetRoute extends BaseServiceRoute implements Route {
             }
 
             updateCumulativeServiceStatus(services.get(0), serviceDAO);
-
+            response.type(HttpConstants.APPLICATION_JSON);
             return CommonUtils.convertObjectToJson(services);
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error in getting services for tenant " + tenant, e);

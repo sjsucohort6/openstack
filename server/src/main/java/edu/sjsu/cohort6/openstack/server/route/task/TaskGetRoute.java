@@ -18,6 +18,7 @@ import edu.sjsu.cohort6.openstack.common.model.Task;
 import edu.sjsu.cohort6.openstack.common.util.CommonUtils;
 import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.db.mongodb.TaskDAO;
+import edu.sjsu.cohort6.openstack.server.HttpConstants;
 import lombok.extern.java.Log;
 import spark.Request;
 import spark.Response;
@@ -48,6 +49,7 @@ public class TaskGetRoute implements Route {
         try {
             TaskDAO taskDAO = (TaskDAO) dbClient.getDAO(TaskDAO.class);
             List<Task> tasks = taskDAO.fetchById(null);
+            response.type(HttpConstants.APPLICATION_JSON);
             return CommonUtils.convertListToJson(tasks);
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error in getting tasks for tenant " + tenant, e);

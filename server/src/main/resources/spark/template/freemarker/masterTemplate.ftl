@@ -1,4 +1,4 @@
-<#macro masterTemplate title="OpenStack">
+<#macro masterTemplate title="OpenStack" moduleName="openstackApp">
 <!DOCTYPE html>
 <!--
   ~ Copyright (c) 2015 San Jose State University.
@@ -14,7 +14,7 @@
   ~ all copies or substantial portions of the Software.
   -->
 
-<html lang="en">
+<html lang="en" ng-app=${moduleName}>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -58,6 +58,7 @@
 <script src="../js/bootstrap.min.js"></script>
 <script src="../js/dataTables.bootstrap.min.js"></script>
 <script src="../js/jquery.dataTables.min.js"></script>
+<script src="../js/jquery.rest.min.js"></script>
 <script src="../js/scripts.js"></script>
 </body>
 </html>
