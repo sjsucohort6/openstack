@@ -34,7 +34,7 @@ public class SshClientTest {
         int port = 2022;
 
         SshClient sshClient = new SshClient();
-        String command = "source ~/keystonerc_admin; nova list";
+        String command = "source ~/keystonerc_admin; nova quota-show";
         List<String> actual = sshClient.executeCommand(userName, password, host, port, command);
 
         for (String s: actual) {

@@ -48,7 +48,6 @@
                                 </th>
                             </tr>
                             </tfoot>
-
                             <tbody>
                                 <#list services as service>
                                 <tr>
@@ -72,10 +71,8 @@
 
                                     </td>
                                     <td>
-                                        <td>
-                                            <input type="radio" name="services" value="${service.name}"
+                                        <input type="radio" name="services" value="${service.name}"
                                                style="vertical-align: middle; margin: 0px;">
-                                        </td>
                                     </td>
                                 </tr>
                                 </#list>
@@ -86,12 +83,13 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        <input type="button" class="btn btn-primary btn-sm active"  value="Add Service"
+                        <input type="button" class="btn btn-primary btn-sm active" value="Add Service"
                                id="addService">
-                        <input type="button" class="btn btn-primary btn-sm active"  value="Get Service"
+                        <input type="button" class="btn btn-primary btn-sm active" value="Get Service"
                                id="getService">
-                        <input type="button" class="btn btn-primary btn-sm active"  value="Delete Service"
+                        <input type="button" class="btn btn-primary btn-sm active" value="Delete Service"
                                id="deleteService">
+
                         <div id="deletionStatus" class="text-danger">
 
                         </div>
@@ -117,7 +115,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
+                        <#--<button type="button" class="btn btn-primary">Save changes</button>-->
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -127,18 +125,49 @@
         <div class="modal fade" id="serviceAddModal">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Add Service</h4>
-                    </div>
-                    <div class="modal-body">
-                                <!-- TODO -->
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                    </div>
+                    <form role="form">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Add Service</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="serviceName">Service Name</label>
+                                <input type="text" class="form-control" id="serviceName">
+                            </div>
+                            <div class="form-group">
+                                <label for="serviceType">Service Name</label>
+                                <select class="form-control" id="serviceType">
+                                    <option>BASIC</option>
+                                    <option>BIG</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="network">Network</label>
+                                <select class="form-control" id="network">
+                                    <#list networks as network>
+                                        <option>${network}</option>
+                                    </#list>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="numNodes">Number of Nodes (1 DB Node is created if number of nodes is >
+                                    1)</label>
+                                <select class="form-control" id="numNodes">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" id="addServicePost">Add</button>
+                            <div id="addServiceStatus"></div>
+                        </div>
+                    </form>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
@@ -156,7 +185,8 @@
                         Are you sure?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="confirmDelete">Delete</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="confirmDelete">Delete
+                        </button>
                         <button type="button" data-dismiss="modal" class="btn">Cancel</button>
                     </div>
                 </div><!-- /.modal-content -->

@@ -19,6 +19,7 @@ package edu.sjsu.cohort6.openstack.server;
  */
 public interface HttpConstants {
     public static final String APPLICATION_JSON = "application/json";
+    public static final String TEXT_PLAIN = "text/plain";
     public static final int HTTP_BAD_REQUEST = 400;
     public static final int HTTP_NOT_AUTHORIZED = 401;
     public static final int HTTP_OK = 200;

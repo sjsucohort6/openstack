@@ -95,7 +95,7 @@ public class SparkServer {
 
 
             // initialize the views.
-            MainView view = new MainView(dbClient);
+            MainView view = new MainView(user, password, tenant, dbClient);
 
 
 

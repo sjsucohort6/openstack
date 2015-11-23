@@ -14,16 +14,15 @@
 
 package edu.sjsu.cohort6.openstack.server.route.quota;
 
-import edu.sjsu.cohort6.openstack.client.OpenStack4JClient;
-import edu.sjsu.cohort6.openstack.common.util.CommonUtils;
+import edu.sjsu.cohort6.openstack.client.SshClient;
 import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.server.HttpConstants;
 import lombok.extern.java.Log;
-import org.openstack4j.model.compute.SimpleTenantUsage;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -34,6 +33,7 @@ import java.util.logging.Level;
 @Log
 public class QuotaGetRoute implements Route {
 
+    public static final String QUOTA_SHOW_CMD = "source ~/keystonerc_admin; nova quota-show";
     private final String user;
     private final String password;
     private final String tenant;
@@ -49,10 +49,16 @@ public class QuotaGetRoute implements Route {
     @Override
     public Object handle(Request request, Response response) throws Exception {
         try {
-            OpenStack4JClient client = new OpenStack4JClient(user, password, tenant);
-            SimpleTenantUsage usage = client.getQuotaForTenant();
-            response.type(HttpConstants.APPLICATION_JSON);
-            return CommonUtils.convertObjectToJson(usage);
+            SshClient sshClient = new SshClient();
+            String command = QUOTA_SHOW_CMD;
+            List<String> actual = sshClient.executeCommand(user, password, "localhost", 2022, command);
+            StringBuilder sb = new StringBuilder();
+            for (String s: actual) {
+                sb.append(s);
+            }
+            response.type(HttpConstants.TEXT_PLAIN);
+            response.status(HttpConstants.HTTP_OK);
+            return sb.toString();
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error in getting quota for tenant " + tenant, e);
             throw e;
