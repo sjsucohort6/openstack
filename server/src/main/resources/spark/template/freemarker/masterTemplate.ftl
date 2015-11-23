@@ -26,8 +26,7 @@
     <meta name="author" content="LayoutIt!">
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
-    <link href="../css/dataTables.bootstrap.min.css" rel="stylesheet">
-    <link href="../css/jquery.dataTables.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../DataTables/datatables.min.css"/>
     <link href="../css/style.css" rel="stylesheet">
 
 </head>
@@ -56,8 +55,7 @@
 </div>
 <script src="../js/jquery.min.js"></script>
 <script src="../js/bootstrap.min.js"></script>
-<script src="../js/dataTables.bootstrap.min.js"></script>
-<script src="../js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="../DataTables/datatables.min.js"></script>
 <script src="../js/jquery.rest.min.js"></script>
 <script src="../js/scripts.js"></script>
 </body>
