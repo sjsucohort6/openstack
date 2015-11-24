@@ -39,6 +39,8 @@ import static spark.Spark.get;
 /**
  * Main view handler.
  *
+ * Gets all java objects needed to build the index.ftl page.
+ *
  * @author rwatsh on 11/19/15.
  */
 @Log
@@ -85,26 +87,7 @@ public class MainView {
             }
             attributes.put("networks", networks);
 
-            //osClient.getAllImages();
-
-            // For quota
-            /*try {
-                SshClient sshClient = new SshClient();
-                String command = MessageFormat.format(QuotaGetRoute.QUOTA_SHOW_CMD, tenant);
-                log.info("Executing ssh command : " + command);
-                List<String> actual = sshClient.executeCommand(sshUser, sshPassword, sshHost, QuotaGetRoute.SSH_PORT, command);
-                StringBuilder sb = new StringBuilder();
-                for (String s: actual) {
-                    sb.append(s).append("\n");
-                }
-
-                log.info("SSH response: " + sb.toString());
-                //return sb.toString();
-                attributes.put("quota", sb.toString());
-            } catch (Exception e) {
-                log.log(Level.SEVERE, "Error in getting quota for tenant " + tenant, e);
-                throw e;
-            }*/
+            //osClient.getAllImages(); TODO make image selectable
 
             attributes.put("tenant", tenant);
             attributes.put("user", user);

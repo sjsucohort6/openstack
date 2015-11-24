@@ -47,6 +47,9 @@ import static edu.sjsu.cohort6.openstack.server.HttpConstants.*;
 import static spark.Spark.*;
 
 /**
+ * The start point of application. It initializes everything, db to webserver and launches the
+ * embedded spark server.
+ *
  * @author rwatsh on 11/15/15.
  */
 @Log
@@ -109,11 +112,8 @@ public class SparkServer {
 
             enableCORS("*", "*", "*");
 
-
             // initialize the views.
             MainView view = new MainView(user, password, tenant, dbClient, sshUser, sshPassword, sshHost);
-
-
 
         } catch (Exception e) {
             halt(HTTP_INTERNAL_ERR, "Internal error occurred on server, exception is: " + e.toString());
@@ -138,6 +138,7 @@ public class SparkServer {
         return dbClient;
     }
 
+    // Cross origin resource sharing filter.
     private static void enableCORS(final String origin, final String methods, final String headers) {
         before(new Filter() {
             @Override
