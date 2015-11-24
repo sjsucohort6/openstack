@@ -61,7 +61,7 @@ public class TaskDAO extends BasicDAO<Task, String>  implements BaseDAO<Task> {
         }
     }
 
-    public void addOrUpdate(List<Task> entityList) throws DBException {
+    public synchronized void addOrUpdate(List<Task> entityList) throws DBException {
         List<String> ids = new ArrayList<>();
         if (entityList != null && !entityList.isEmpty()) {
             Task t = entityList.get(0);
