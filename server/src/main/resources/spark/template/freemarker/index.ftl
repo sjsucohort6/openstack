@@ -8,6 +8,20 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-12">
+                        <h2>Quota for user "${user}" of tenant "${tenant}"</h2>
+                        <div class="well" id="quota">
+                            <#if quota??>
+                                <pre>
+                                    ${quota}
+                                </pre>
+                            </#if>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>Services</h2>
                         <table id="serviceTable" class="table table-striped table-bordered" cellspacing="0"
                                width="100%">
                             <thead>
@@ -195,6 +209,7 @@
 
         <div class="row">
             <div class="col-md-12">
+                <h2>Tasks</h2>
                 <table id="taskTable" class="table table-striped table-bordered" cellspacing="0" width="100%">
                     <thead>
                     <tr>

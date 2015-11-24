@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.JobKey.jobKey;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 import static org.quartz.impl.matchers.EverythingMatcher.allJobs;
 import static org.quartz.impl.matchers.GroupMatcher.groupEquals;
@@ -115,6 +116,29 @@ public class JobManager implements AutoCloseable {
         Trigger trigger = newTrigger()
                 //.withIdentity(TRIGGER_NAME + "-" + jobClazz.getTypeName(), tenantName)
                 .startNow()
+                .build();
+
+        // Schedule the job with the trigger
+        scheduler.scheduleJob(job, trigger);
+        return job;
+    }
+
+    public JobDetail scheduleJob(Class<? extends Job> jobClazz,
+                                 String jobName,
+                                 String tenantName,
+                                 JobDataMap jobDataMap, int intervalInMins) throws SchedulerException {
+        JobDetail job = newJob(jobClazz)
+                .withIdentity(jobName, tenantName)
+                .usingJobData(jobDataMap)
+                .build();
+
+
+        // Define a Trigger that will fire "now", and not repeat
+        Trigger trigger = newTrigger()
+                .startNow()
+                .withSchedule(simpleSchedule()
+                        .withIntervalInMinutes(intervalInMins)
+                        .repeatForever())
                 .build();
 
         // Schedule the job with the trigger

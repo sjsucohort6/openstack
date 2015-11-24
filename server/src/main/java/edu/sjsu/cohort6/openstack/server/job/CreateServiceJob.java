@@ -75,7 +75,7 @@ public class CreateServiceJob extends BaseServiceJob implements Job {
                         jobManager.scheduleJob(CreateVMJob.class, jobName, tenantName, params);
 
                         // Attach job listener for tracking the job and updating service metadata in DB.
-                        jobManager.registerJobListener(new CreateVMJobListener(dbClient), jobName, tenantName);
+                        jobManager.registerJobListener(new CreateVMJobListener(dbClient, jobName), jobName, tenantName);
                     }
                 } else {
 

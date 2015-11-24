@@ -262,7 +262,7 @@ public class ServiceDAO extends BasicDAO<Service, String> implements BaseDAO<Ser
         }
     }
 
-    public void addNode(String serviceName, VmType type, Server s) throws DBException {
+    public synchronized void addNode(String serviceName, VmType type, Server s) throws DBException {
         List<Service> services = fetchById(new ArrayList<String>(){{add(serviceName);}});
         if (services != null && !services.isEmpty()) {
             Service service = services.get(0);

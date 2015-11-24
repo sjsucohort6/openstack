@@ -115,6 +115,14 @@ public class CreateVMJob extends BaseServiceJob implements Job {
                 String msg1 = "Provisioned VM " + server.getName() + " with status " + server.getStatus().value();
                 LOGGER.info(msg1);
                 jobHelper.saveTaskInfo(context, msg1);
+                /*ServiceDAO serviceDAO = (ServiceDAO) dbClient.getDAO(ServiceDAO.class);
+                try {
+                    Server s = client.getServerByName(vmName);
+                    serviceDAO.addNode(serviceName, node.getType(), s);
+                } catch (DBException e) {
+                    e.printStackTrace();
+                    jobHelper.saveTaskInfo(context, msg);
+                }*/
                 return;
             }
         } catch (Exception e) {

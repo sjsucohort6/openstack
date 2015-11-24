@@ -66,4 +66,5 @@ public interface OpenStackInterface extends AutoCloseable {
     void deleteNetwork(Network network);
 
 
+    //void getAllImages();
 }

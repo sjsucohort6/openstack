@@ -36,17 +36,19 @@ public class CreateVMJobListener implements JobListener{
     private DBClient dbClient;
     private ServiceDAO serviceDAO;
     private TaskDAO taskDAO;
+    private String jobName;
 
-    public CreateVMJobListener(DBClient dbClient) {
+    public CreateVMJobListener(DBClient dbClient, String jobName) {
         this.dbClient = dbClient;
         this.serviceDAO = (ServiceDAO) dbClient.getDAO(ServiceDAO.class);
         this.taskDAO = (TaskDAO) dbClient.getDAO(TaskDAO.class);
         this.jobHelper = new JobHelper(dbClient);
+        this.jobName = jobName;
     }
 
     @Override
     public String getName() {
-        return "CreateVMJobListener";
+        return "CreateVMJobListener-" + jobName;
     }
 
     @Override

@@ -34,6 +34,7 @@ public class MongoDBClient implements DBClient {
     private final String dbName;
     private ServiceDAO serviceDAO;
     private TaskDAO taskDAO;
+    private QuotaDAO quotaDAO;
     private Morphia morphia = null;
     private MongoClient mongoClient;
     private Datastore morphiaDatastore;
@@ -60,6 +61,7 @@ public class MongoDBClient implements DBClient {
         morphiaDatastore.ensureIndexes();
         serviceDAO = new ServiceDAO(mongoClient, morphia, dbName);
         taskDAO = new TaskDAO(mongoClient, morphia, dbName);
+        quotaDAO = new QuotaDAO(mongoClient, morphia, dbName);
     }
 
     @Override
@@ -95,6 +97,8 @@ public class MongoDBClient implements DBClient {
                 return serviceDAO;
             } else if (clazz.getTypeName().equalsIgnoreCase(TaskDAO.class.getTypeName())) {
                 return taskDAO;
+            } else if (clazz.getTypeName().equalsIgnoreCase(QuotaDAO.class.getTypeName())) {
+                return quotaDAO;
             }
         }
         return null;

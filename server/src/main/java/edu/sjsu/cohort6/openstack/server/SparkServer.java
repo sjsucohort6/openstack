@@ -22,7 +22,9 @@ import edu.sjsu.cohort6.openstack.db.DBFactory;
 import edu.sjsu.cohort6.openstack.db.DatabaseModule;
 import edu.sjsu.cohort6.openstack.server.filter.AuthenticationDetails;
 import edu.sjsu.cohort6.openstack.server.job.AllJobsListener;
+import edu.sjsu.cohort6.openstack.server.job.JobConstants;
 import edu.sjsu.cohort6.openstack.server.job.JobManager;
+import edu.sjsu.cohort6.openstack.server.job.QuotaCollectorJob;
 import edu.sjsu.cohort6.openstack.server.route.quota.QuotaGetRoute;
 import edu.sjsu.cohort6.openstack.server.route.service.ServiceDeleteRoute;
 import edu.sjsu.cohort6.openstack.server.route.service.ServiceGetRoute;
@@ -31,6 +33,7 @@ import edu.sjsu.cohort6.openstack.server.route.service.ServicePostRoute;
 import edu.sjsu.cohort6.openstack.server.route.task.TaskGetRoute;
 import edu.sjsu.cohort6.openstack.server.view.MainView;
 import lombok.extern.java.Log;
+import org.quartz.JobDataMap;
 import org.quartz.SchedulerException;
 import spark.Filter;
 import spark.Request;
@@ -88,14 +91,27 @@ public class SparkServer {
             log.info("GET " + VIRTAPP_API_V1_0_TASKS + " handler added");
             get(VIRTAPP_API_V1_0_TASKS, new TaskGetRoute(user, password, tenant, dbClient));
 
+            String sshUser = props.getProperty("ssh_user", "root");
+            String sshPassword = props.getProperty("ssh_password", "CMPE-283");
+            String sshHost = props.getProperty("ssh_host", "localhost");
+            JobDataMap params = new JobDataMap();
+            params.put(JobConstants.SSH_USER, sshUser);
+            params.put(JobConstants.SSH_PASSWORD, sshPassword);
+            params.put(JobConstants.SSH_HOST, sshHost);
+            params.put(JobConstants.DB_CLIENT, dbClient);
+            params.put(JobConstants.TENANT_NAME, tenant);
+            params.put(JobConstants.USER, user);
+            int intervalInMins = 5; // 5 mins
+            JobManager.getInstance().scheduleJob(QuotaCollectorJob.class, JobConstants.QUOTA_JOB, tenant, params, intervalInMins);
+
             log.info("GET " + VIRTAPP_API_V1_0_QUOTA + " handler added");
-            get(VIRTAPP_API_V1_0_QUOTA, new QuotaGetRoute(user, password, tenant, dbClient));
+            get(VIRTAPP_API_V1_0_QUOTA, new QuotaGetRoute(user, tenant, dbClient));
 
             enableCORS("*", "*", "*");
 
 
             // initialize the views.
-            MainView view = new MainView(user, password, tenant, dbClient);
+            MainView view = new MainView(user, password, tenant, dbClient, sshUser, sshPassword, sshHost);
 
 
 
@@ -109,7 +125,7 @@ public class SparkServer {
          * Start the job scheduler.
          */
         JobManager jobManager = JobManager.getInstance();
-        AllJobsListener jobListener = new AllJobsListener("CreateVMJobListener");
+        AllJobsListener jobListener = new AllJobsListener("AllJobListener");
         jobManager.registerJobListener(jobListener);
         jobManager.startScheduler();
     }
