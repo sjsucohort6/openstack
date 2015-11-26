@@ -44,6 +44,8 @@ public interface JobConstants {
     public static final String SSH_HOST = "sshHost";
     public static final String QUOTA_JOB = "quota-collect-job";
 
-    public static final String QUOTA_SHOW_CMD = "source ~/keystonerc_admin; nova absolute-limits --tenant {0}";
+    public static final String USAGE_LIST_CMD = "source ~/keystonerc_admin; nova usage-list --start {0} --end {1}";
+    public static final String RESOURCE_USAGE_CMD = "source ~/keystonerc_admin; nova-manage service describe_resource --host={0}";
     public static final int SSH_PORT = 22;
+    public static final String OPENSTACK_COMPUTE_HOST = "openstack_compute_host";
 }

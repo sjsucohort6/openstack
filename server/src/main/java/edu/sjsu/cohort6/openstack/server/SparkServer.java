@@ -94,18 +94,12 @@ public class SparkServer {
             log.info("GET " + VIRTAPP_API_V1_0_TASKS + " handler added");
             get(VIRTAPP_API_V1_0_TASKS, new TaskGetRoute(user, password, tenant, dbClient));
 
+            // Start quota collection
             String sshUser = props.getProperty("ssh_user", "root");
             String sshPassword = props.getProperty("ssh_password", "CMPE-283");
             String sshHost = props.getProperty("ssh_host", "localhost");
-            JobDataMap params = new JobDataMap();
-            params.put(JobConstants.SSH_USER, sshUser);
-            params.put(JobConstants.SSH_PASSWORD, sshPassword);
-            params.put(JobConstants.SSH_HOST, sshHost);
-            params.put(JobConstants.DB_CLIENT, dbClient);
-            params.put(JobConstants.TENANT_NAME, tenant);
-            params.put(JobConstants.USER, user);
-            int intervalInMins = 5; // 5 mins
-            JobManager.getInstance().scheduleJob(QuotaCollectorJob.class, JobConstants.QUOTA_JOB, tenant, params, intervalInMins);
+            String openStackComputeHost = props.getProperty("openstack_compute_host", "CMPE-OPENSTACK.localdomain");
+            scheduleQuotaCollectorJob(dbClient, tenant, user, sshUser, sshPassword, sshHost, openStackComputeHost);
 
             log.info("GET " + VIRTAPP_API_V1_0_QUOTA + " handler added");
             get(VIRTAPP_API_V1_0_QUOTA, new QuotaGetRoute(user, tenant, dbClient));
@@ -118,6 +112,19 @@ public class SparkServer {
         } catch (Exception e) {
             halt(HTTP_INTERNAL_ERR, "Internal error occurred on server, exception is: " + e.toString());
         }
+    }
+
+    public static void scheduleQuotaCollectorJob(DBClient dbClient, String tenant, String user, String sshUser, String sshPassword, String sshHost, String openStackComputeHost) throws SchedulerException {
+        JobDataMap params = new JobDataMap();
+        params.put(JobConstants.SSH_USER, sshUser);
+        params.put(JobConstants.SSH_PASSWORD, sshPassword);
+        params.put(JobConstants.SSH_HOST, sshHost);
+        params.put(JobConstants.DB_CLIENT, dbClient);
+        params.put(JobConstants.TENANT_NAME, tenant);
+        params.put(JobConstants.USER, user);
+        params.put(JobConstants.OPENSTACK_COMPUTE_HOST, openStackComputeHost);
+        int intervalInMins = 5; // 5 mins
+        JobManager.getInstance().scheduleJob(QuotaCollectorJob.class, JobConstants.QUOTA_JOB, tenant, params, intervalInMins);
     }
 
     private void initJobManager() throws SchedulerException {

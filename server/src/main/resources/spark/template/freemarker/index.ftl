@@ -8,7 +8,7 @@
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-12">
-                        <h2>Quota for user "${user}" of tenant "${tenant}"</h2>
+                        <h2>Resource usage for user "${user}" of tenant "${tenant}"</h2>
                         <div class="well" id="quota">
                             <#if quota??>
                                 <pre>
