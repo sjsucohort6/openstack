@@ -33,7 +33,7 @@ $('#getService').on('click',function(){
 $("#deleteService").on("click", function(){
     jQuery.noConflict();
     // Show confirmation modal
-    $('#confirmDeleteModal').modal("show");
+    $('#confirmDeleteModal').modal("show");ss
 });
 
 // Handle deletion of service

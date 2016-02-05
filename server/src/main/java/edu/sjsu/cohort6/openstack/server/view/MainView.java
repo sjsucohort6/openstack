@@ -24,6 +24,7 @@ import edu.sjsu.cohort6.openstack.db.DBClient;
 import edu.sjsu.cohort6.openstack.db.mongodb.QuotaDAO;
 import edu.sjsu.cohort6.openstack.db.mongodb.ServiceDAO;
 import edu.sjsu.cohort6.openstack.db.mongodb.TaskDAO;
+import edu.sjsu.cohort6.openstack.server.HttpConstants;
 import lombok.extern.java.Log;
 import org.openstack4j.model.network.Network;
 import spark.ModelAndView;
@@ -67,7 +68,7 @@ public class MainView {
         FreeMarkerEngine templateEngine = ResourceUtils.getFreeMarkerEngine();
 
 
-        get("/openstack/index.ftl", (req, res) -> {
+        get(HttpConstants.VIEW_PATH, (req, res) -> {
             Map<String, Object> attributes = new HashMap<>();
 
             ServiceDAO serviceDAO = (ServiceDAO) dbClient.getDAO(ServiceDAO.class);

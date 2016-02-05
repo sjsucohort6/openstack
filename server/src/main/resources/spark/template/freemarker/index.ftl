@@ -151,7 +151,7 @@
                                 <input type="text" class="form-control" id="serviceName">
                             </div>
                             <div class="form-group">
-                                <label for="serviceType">Service Name</label>
+                                <label for="serviceType">Service Type</label>
                                 <select class="form-control" id="serviceType">
                                     <option>BASIC</option>
                                     <option>BIG</option>

@@ -82,17 +82,7 @@ public class SparkServer {
             AuthenticationDetails authDetails = new AuthenticationDetails(tenant, user, password);
 
             // initialize route handlers.
-            log.info("POST " + VIRTAPP_API_V1_0_SERVICES + " handler added");
-            post(VIRTAPP_API_V1_0_SERVICES, new ServicePostRoute(dbClient, authDetails));
-            log.info("DELETE " + VIRTAPP_API_V1_0_SERVICE_NAME + " handler added");
-            delete(VIRTAPP_API_V1_0_SERVICE_NAME, new ServiceDeleteRoute(dbClient, authDetails));
-            log.info("GET " + VIRTAPP_API_V1_0_SERVICES + " handler added");
-            get(VIRTAPP_API_V1_0_SERVICES, new ServiceGetRoute(user, password, tenant, dbClient));
-            log.info("GET " + VIRTAPP_API_V1_0_SERVICE_NAME + " handler added");
-            get(VIRTAPP_API_V1_0_SERVICE_NAME, new ServiceNameGetRoute(user, password, tenant, dbClient));
-
-            log.info("GET " + VIRTAPP_API_V1_0_TASKS + " handler added");
-            get(VIRTAPP_API_V1_0_TASKS, new TaskGetRoute(user, password, tenant, dbClient));
+            initializeRoutes(dbClient, tenant, user, password, authDetails);
 
             // Start quota collection
             String sshUser = props.getProperty("ssh_user", "root");
@@ -107,11 +97,29 @@ public class SparkServer {
             enableCORS("*", "*", "*");
 
             // initialize the views.
-            MainView view = new MainView(user, password, tenant, dbClient, sshUser, sshPassword, sshHost);
+            initializeViews(dbClient, tenant, user, password, sshUser, sshPassword, sshHost);
 
         } catch (Exception e) {
             halt(HTTP_INTERNAL_ERR, "Internal error occurred on server, exception is: " + e.toString());
         }
+    }
+
+    public static void initializeViews(DBClient dbClient, String tenant, String user, String password, String sshUser, String sshPassword, String sshHost) {
+        MainView view = new MainView(user, password, tenant, dbClient, sshUser, sshPassword, sshHost);
+    }
+
+    public static void initializeRoutes(DBClient dbClient, String tenant, String user, String password, AuthenticationDetails authDetails) throws SchedulerException {
+        log.info("POST " + VIRTAPP_API_V1_0_SERVICES + " handler added");
+        post(VIRTAPP_API_V1_0_SERVICES, new ServicePostRoute(dbClient, authDetails));
+        log.info("DELETE " + VIRTAPP_API_V1_0_SERVICE_NAME + " handler added");
+        delete(VIRTAPP_API_V1_0_SERVICE_NAME, new ServiceDeleteRoute(dbClient, authDetails));
+        log.info("GET " + VIRTAPP_API_V1_0_SERVICES + " handler added");
+        get(VIRTAPP_API_V1_0_SERVICES, new ServiceGetRoute(user, password, tenant, dbClient));
+        log.info("GET " + VIRTAPP_API_V1_0_SERVICE_NAME + " handler added");
+        get(VIRTAPP_API_V1_0_SERVICE_NAME, new ServiceNameGetRoute(user, password, tenant, dbClient));
+
+        log.info("GET " + VIRTAPP_API_V1_0_TASKS + " handler added");
+        get(VIRTAPP_API_V1_0_TASKS, new TaskGetRoute(user, password, tenant, dbClient));
     }
 
     public static void scheduleQuotaCollectorJob(DBClient dbClient, String tenant, String user, String sshUser, String sshPassword, String sshHost, String openStackComputeHost) throws SchedulerException {

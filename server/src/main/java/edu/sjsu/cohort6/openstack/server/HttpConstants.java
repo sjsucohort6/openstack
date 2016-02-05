@@ -32,6 +32,7 @@ public interface HttpConstants {
     String VIRTAPP_API_V1_0_QUOTA = VIRTAPP_API_V1_0 + "/quota";
     String VIRTAPP_API_V1_0_SERVICES = VIRTAPP_API_V1_0 + "/services";
     String VIRTAPP_API_V1_0_SERVICE_NAME = VIRTAPP_API_V1_0_SERVICES + "/:serviceName";
+    String VIEW_PATH = "/openstack/index.ftl";
     String WWW_DIR = "/public";
 }
 
